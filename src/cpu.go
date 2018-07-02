@@ -3,21 +3,35 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
 )
 
 type CPU struct {
-	memory Memory
-	A      byte
-	Y      byte // low
-	X      byte // high
-	S      byte
-	P      byte
-	PC     int16
+	memory       Memory
+	A            byte
+	Y            byte // low
+	X            byte // high
+	S            byte
+	P            byte
+	PC           int16
+	instructions map[AssemblyInstructionType]func(AddressingMode)
 }
 
-func newCPU() CPU {
-	return CPU{memory: newMemory()}
+func newCPU(mem Memory) CPU {
+	cpu := CPU{memory: mem}
+	cpu.instructions = make(map[AssemblyInstructionType]func(AddressingMode))
+
+	// Wiring instruction implementation methods
+	cpu.instructions[BNE] = cpu.BNE
+	cpu.instructions[BRK] = cpu.BRK
+	cpu.instructions[CPX] = cpu.CPX
+	cpu.instructions[INX] = cpu.INX
+	cpu.instructions[INY] = cpu.INY
+	cpu.instructions[LDA] = cpu.LDA
+	cpu.instructions[LDX] = cpu.LDX
+	cpu.instructions[STA] = cpu.STA
+	cpu.instructions[TAY] = cpu.TAY
+	cpu.instructions[TYA] = cpu.TYA
+	return cpu
 }
 
 func (c *CPU) setStatusCarry(flag bool) {
@@ -62,10 +76,24 @@ func toInt16(data []byte) (ret int16) {
 	return
 }
 
-func (c *CPU) Start(PCH byte, PCL byte) {
+func (cpu *CPU) Start(PCH byte, PCL byte) {
+	// initialise an instruction type map
+	instrTypes := assemblyInstructions()
+
+	// Get the initial value of the program counter
 	PC := toInt16([]byte{PCL, PCH})
 	for {
-		instrCode := c.memory.ReadAbsolute(PC)
-		fmt.Println(instrCode)
+		// Fetch first executable instruction code from memory
+		instrCode := cpu.memory.ReadAbsolute(PC)
+
+		// Resolve instruction by instruction code
+		instruction := instrTypes(instrCode)
+
+		// Run instruction, and passing the addressingmode as param
+		cpu.instructions[instruction.Type](instruction.AddressingMode)
+
+		// increase program counter
+		PC++
+		break
 	}
 }
