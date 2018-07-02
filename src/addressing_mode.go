@@ -1,4 +1,4 @@
-package MOS6510
+package main
 
 type AddressingMode int
 
