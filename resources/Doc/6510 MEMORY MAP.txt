@@ -1,0 +1,28 @@
+6510 MEMORY MAP
+
+       +-------------------+
+  FFFF |                   |
+       |    ADDRESSABLE    |
+       /      EXTERNAL     /
+       /       MEMORY      /
+       |                   |
+  0200 |                   |
+       +-------------------+           STACK
+  01FF |  |    STACK    |  | 01FF <--- POINTER
+  0100 | \|/   Page 1  \|/ |           INITIALIZED
+       +-------------------+
+  00FF |                   |
+       |       Page 0      |
+       +-------------------+
+       |  OUTPUT REGISTER  | 0001 <-+- Used For
+       +-------------------+        |  Internal
+  0000 |DATA DIRECTION REG.| 0000 <-+  I/O Port
+       +-------------------+
+
+
+$400 - Screen
+$D800 - Color RAM
+$D020 - Frame color
+$D021 - Background color
+$C6 - Number of chars in keyboard buffer
+$0277 - Keyboard buffer

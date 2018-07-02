@@ -1,0 +1,1 @@
+java -jar KickAss.jar mycode.asm

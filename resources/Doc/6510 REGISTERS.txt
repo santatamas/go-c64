@@ -1,0 +1,35 @@
+PROGRAMMING MODEL
+                        +---------------+
+                        |       A       |  ACCUMULATOR           A
+                        +---------------+
+
+                        +---------------+
+                        |       Y       |  INDEX REGISTER        Y
+                        +---------------+
+
+                        +---------------+
+                        |       X       |  INDEX REGISTER        X
+                        +---------------+
+        15               7             0
+        +---------------+---------------+
+        |      PCH      |      PCL      |  PROGRAM COUNTER     "PC"
+        +---------------+---------------+
+                       8 7             0
+                      +-+---------------+
+                      |1|       S       |  STACK POINTER        "S"
+                      +-+---------------+
+                         7             0
+                        +-+-+-+-+-+-+-+-+
+                        |N|V| |B|D|I|Z|C|  PROCESSOR STATUS REG "P"
+                        +-+-+-+-+-+-+-+-+
+                         | |   | | | | |
+                         | |   | | | | +>  CARRY         1=TRUE
+                         | |   | | | +-->  ZERO          1=RESULT ZERO
+                         | |   | | +---->  IRQ DISABLE   1=DISABLE
+                         | |   | +------>  DECIMAL MODE  1=TRUE
+                         | |   +-------->  BRK COMMAND
+                         | |
+                         | +------------>  OVERFLOW      1=TRUE
+                         +-------------->  NEGATIVE      1=NEG
+
+
