@@ -1,5 +1,9 @@
 package main
 
+import (
+	"fmt"
+)
+
 type AssemblyInstruction struct {
 	Type           AssemblyInstructionType
 	AddressingMode AddressingMode
@@ -267,6 +271,7 @@ func assemblyInstructions() func(byte) AssemblyInstruction {
 	}
 
 	return func(key byte) AssemblyInstruction {
+		fmt.Println("Resolving instruction by bytecode: ", key)
 		return innerMap[key]
 	}
 }

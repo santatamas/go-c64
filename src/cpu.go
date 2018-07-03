@@ -3,35 +3,21 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 )
 
 type CPU struct {
-	memory       Memory
-	A            byte
-	Y            byte // low
-	X            byte // high
-	S            byte
-	P            byte
-	PC           int16
-	instructions map[AssemblyInstructionType]func(AddressingMode)
+	memory Memory
+	A      byte
+	Y      byte // low
+	X      byte // high
+	S      byte
+	P      byte
+	PC     uint16
 }
 
 func newCPU(mem Memory) CPU {
-	cpu := CPU{memory: mem}
-	cpu.instructions = make(map[AssemblyInstructionType]func(AddressingMode))
-
-	// Wiring instruction implementation methods
-	cpu.instructions[BNE] = cpu.BNE
-	cpu.instructions[BRK] = cpu.BRK
-	cpu.instructions[CPX] = cpu.CPX
-	cpu.instructions[INX] = cpu.INX
-	cpu.instructions[INY] = cpu.INY
-	cpu.instructions[LDA] = cpu.LDA
-	cpu.instructions[LDX] = cpu.LDX
-	cpu.instructions[STA] = cpu.STA
-	cpu.instructions[TAY] = cpu.TAY
-	cpu.instructions[TYA] = cpu.TYA
-	return cpu
+	return CPU{memory: mem}
 }
 
 func (c *CPU) setStatusCarry(flag bool) {
@@ -70,7 +56,7 @@ func (c *CPU) getStatusNegative() bool {
 	return c.S&0x80 == 0x80
 }
 
-func toInt16(data []byte) (ret int16) {
+func toInt16(data []byte) (ret uint16) {
 	buf := bytes.NewBuffer(data)
 	binary.Read(buf, binary.LittleEndian, &ret)
 	return
@@ -81,19 +67,23 @@ func (cpu *CPU) Start(PCH byte, PCL byte) {
 	instrTypes := assemblyInstructions()
 
 	// Get the initial value of the program counter
-	PC := toInt16([]byte{PCL, PCH})
+	cpu.PC = toInt16([]byte{PCL, PCH})
+	fmt.Printf("Start address: %x \n", cpu.PC)
 	for {
+		fmt.Printf("Current PC address: %x \n", cpu.PC)
+
 		// Fetch first executable instruction code from memory
-		instrCode := cpu.memory.ReadAbsolute(PC)
+		instrCode := cpu.memory.ReadAbsolute(cpu.PC)
+		cpu.PC++
+
+		fmt.Printf("Next instruction code: %x \n", instrCode)
 
 		// Resolve instruction by instruction code
 		instruction := instrTypes(instrCode)
+		if instruction.Type == BRK {
+			break
+		}
 
-		// Run instruction, and passing the addressingmode as param
-		cpu.instructions[instruction.Type](instruction.AddressingMode)
-
-		// increase program counter
-		PC++
-		break
+		cpu.callMethod(instruction)
 	}
 }
