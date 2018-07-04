@@ -1,8 +1,6 @@
 package main
 
-import (
-	"fmt"
-)
+import "log"
 
 type AssemblyInstruction struct {
 	Type           AssemblyInstructionType
@@ -271,7 +269,7 @@ func assemblyInstructions() func(byte) AssemblyInstruction {
 	}
 
 	return func(key byte) AssemblyInstruction {
-		fmt.Println("Resolving instruction by bytecode: ", key)
+		log.Println("Resolving instruction by bytecode: ", key)
 		return innerMap[key]
 	}
 }

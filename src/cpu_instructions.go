@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 )
 
 func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
@@ -30,17 +30,17 @@ func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
 }
 
 func (cpu *CPU) BNE(mode AddressingMode) {
-	fmt.Println("BNE called")
+	log.Println("BNE called")
 	cpu.PC++
 }
 
 func (cpu *CPU) BRK(mode AddressingMode) {
 	// Do nothing apparently?
-	fmt.Println("BRK called")
+	log.Println("BRK called")
 }
 
 func (cpu *CPU) CPX(mode AddressingMode) {
-	fmt.Println("CPX called")
+	log.Println("CPX called")
 	if mode == Immidiate {
 		aa := cpu.memory.ReadAbsolute(cpu.PC)
 		cpu.PC++
@@ -55,32 +55,32 @@ func (cpu *CPU) CPX(mode AddressingMode) {
 }
 
 func (cpu *CPU) INX(mode AddressingMode) {
-	fmt.Println("INX called")
+	log.Println("INX called")
 	cpu.X++
 	cpu.PC++
 }
 
 func (cpu *CPU) INY(mode AddressingMode) {
-	fmt.Println("INY called")
+	log.Println("INY called")
 	cpu.Y++
 	cpu.PC++
 }
 
 func (cpu *CPU) LDA(mode AddressingMode) {
-	fmt.Println("LDA called")
+	log.Println("LDA called")
 	if mode == Immidiate {
 		cpu.A = cpu.memory.ReadAbsolute(cpu.PC)
-		fmt.Printf("Value loaded to CPU register A: %x \n", cpu.A)
+		log.Printf("Value loaded to CPU register A: %x \n", cpu.A)
 		cpu.PC++
 	}
 }
 
 func (cpu *CPU) LDX(mode AddressingMode) {
-	fmt.Println("LDX called")
+	log.Println("LDX called")
 }
 
 func (cpu *CPU) STA(mode AddressingMode) {
-	fmt.Println("STA called")
+	log.Println("STA called")
 	if mode == Absolute {
 		cpu.Y = cpu.memory.ReadAbsolute(cpu.PC)
 		cpu.PC++
@@ -93,7 +93,7 @@ func (cpu *CPU) STA(mode AddressingMode) {
 }
 
 func (cpu *CPU) TAY(mode AddressingMode) {
-	fmt.Println("TAY called")
+	log.Println("TAY called")
 	if mode == Absolute {
 		cpu.Y = cpu.A
 		cpu.PC++
@@ -101,7 +101,7 @@ func (cpu *CPU) TAY(mode AddressingMode) {
 }
 
 func (cpu *CPU) TYA(mode AddressingMode) {
-	fmt.Println("TYA called")
+	log.Println("TYA called")
 	if mode == Absolute {
 		cpu.A = cpu.Y
 		cpu.PC++

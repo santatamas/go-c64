@@ -3,11 +3,11 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
-	"fmt"
+	"log"
 )
 
 type CPU struct {
-	memory Memory
+	memory *Memory
 	A      byte
 	Y      byte // low
 	X      byte // high
@@ -16,7 +16,7 @@ type CPU struct {
 	PC     uint16
 }
 
-func newCPU(mem Memory) CPU {
+func newCPU(mem *Memory) CPU {
 	return CPU{memory: mem}
 }
 
@@ -68,15 +68,15 @@ func (cpu *CPU) Start(PCH byte, PCL byte) {
 
 	// Get the initial value of the program counter
 	cpu.PC = toInt16([]byte{PCL, PCH})
-	fmt.Printf("Start address: %x \n", cpu.PC)
+	log.Printf("Start address: %x \n", cpu.PC)
 	for {
-		fmt.Printf("Current PC address: %x \n", cpu.PC)
+		log.Printf("Current PC address: %x \n", cpu.PC)
 
 		// Fetch first executable instruction code from memory
 		instrCode := cpu.memory.ReadAbsolute(cpu.PC)
 		cpu.PC++
 
-		fmt.Printf("Next instruction code: %x \n", instrCode)
+		log.Printf("Next instruction code: %x \n", instrCode)
 
 		// Resolve instruction by instruction code
 		instruction := instrTypes(instrCode)
