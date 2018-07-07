@@ -24,7 +24,6 @@ func main() {
 	memory, startPCH, startPCL := loadFile("1_first.prg")
 	cpu := newCPU(&memory)
 	display := newMemoryDisplay(&memory)
-	display.Init()
 
 	go cpu.Start(startPCH, startPCL)
 	display.Start()

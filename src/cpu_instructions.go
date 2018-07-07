@@ -88,7 +88,9 @@ func (cpu *CPU) STA(mode AddressingMode) {
 		cpu.X = cpu.memory.ReadAbsolute(cpu.PC)
 		cpu.PC++
 
-		cpu.memory.WriteAbsolute(toInt16([]byte{cpu.X, cpu.Y}), cpu.A)
+		log.Println("CPU register A value: ", cpu.A)
+		log.Println("Setting CPU register A to address: ", toInt16([]byte{cpu.Y, cpu.X}))
+		cpu.memory.WriteAbsolute(toInt16([]byte{cpu.Y, cpu.X}), cpu.A)
 	}
 }
 

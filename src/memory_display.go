@@ -11,37 +11,33 @@ type MemoryDisplay struct {
 	memory             *Memory
 	width              int
 	height             int
+	c64Characters      func(byte) rune
 }
 
 func newMemoryDisplay(memory *Memory) MemoryDisplay {
-	result := MemoryDisplay{0x400, 0xD800, memory, 40, 25}
+	result := MemoryDisplay{0x400, 0xD800, memory, 40, 25, asciiCharacters()}
 	return result
 }
 
 func (display *MemoryDisplay) ReadCurrentState() [40][25]rune {
 	result := [40][25]rune{}
 	currentAdr := display.screenStartAddress
-	for x := 0; x < display.width; x++ {
-		for y := 0; y < display.height; y++ {
-			display.memory.ReadAbsolute(currentAdr)
+	for y := 0; y < display.height; y++ {
+		for x := 0; x < display.width; x++ {
+			result[x][y] = display.c64Characters(display.memory.ReadAbsolute(currentAdr))
 			currentAdr++
-			result[x][y] = 1 //C64CharConverter.ConvertToAscii(_memory.ReadAbsolute(currentAdr++));
 		}
 	}
 	return result
 }
 
 func (display *MemoryDisplay) DrawState(state [40][25]rune) {
-	for x := 0; x < display.width; x++ {
+	for y := 0; y < display.height; y++ {
 		fmt.Print("\n")
-		for y := 0; y < display.height; y++ {
-			fmt.Print(state[x][y])
+		for x := 0; x < display.width; x++ {
+			fmt.Print(string(state[x][y]))
 		}
 	}
-}
-
-func (display *MemoryDisplay) Init() {
-	//TODO: do initialization
 }
 
 func (display *MemoryDisplay) Start() {
