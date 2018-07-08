@@ -20,13 +20,31 @@ func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
 		cpu.LDA(instruction.AddressingMode)
 	case LDX:
 		cpu.LDX(instruction.AddressingMode)
+	case LDY:
+		cpu.LDY(instruction.AddressingMode)
 	case STA:
 		cpu.STA(instruction.AddressingMode)
 	case TAY:
 		cpu.TAY(instruction.AddressingMode)
 	case TYA:
 		cpu.TYA(instruction.AddressingMode)
+	case JSR:
+		cpu.JSR(instruction.AddressingMode)
 	}
+}
+
+func (cpu *CPU) JSR(mode AddressingMode) {
+	log.Println("JSR called")
+	hi := cpu.memory.ReadAbsolute(cpu.PC)
+	cpu.PC++
+
+	lo := cpu.memory.ReadAbsolute(cpu.PC)
+	cpu.PC++
+
+	cpu.stackPush(getHI(cpu.PC))
+	cpu.stackPush(getLO(cpu.PC))
+
+	cpu.PC = toInt16_2(hi, lo)
 }
 
 func (cpu *CPU) BNE(mode AddressingMode) {
@@ -88,6 +106,15 @@ func (cpu *CPU) LDX(mode AddressingMode) {
 	if mode == Immidiate {
 		cpu.X = cpu.memory.ReadAbsolute(cpu.PC)
 		log.Printf("Value loaded to CPU register X: %x \n", cpu.X)
+		cpu.PC++
+	}
+}
+
+func (cpu *CPU) LDY(mode AddressingMode) {
+	log.Println("LDY called")
+	if mode == Immidiate {
+		cpu.Y = cpu.memory.ReadAbsolute(cpu.PC)
+		log.Printf("Value loaded to CPU register Y: %x \n", cpu.Y)
 		cpu.PC++
 	}
 }

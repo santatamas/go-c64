@@ -1,23 +1,29 @@
 package main
 
 import (
-	"bytes"
-	"encoding/binary"
 	"log"
 )
 
 type CPU struct {
-	memory *Memory
-	A      byte
-	Y      byte // low
-	X      byte // high
-	S      byte
-	P      byte
-	PC     uint16
+	memory  *Memory
+	A       byte
+	Y       byte // low
+	X       byte // high
+	S       byte
+	P       byte
+	PC      uint16
+	SP      byte
+	SP_LOW  uint16
+	SP_HIGH uint16
 }
 
 func newCPU(mem *Memory) CPU {
-	return CPU{memory: mem}
+	return CPU{
+		memory:  mem,
+		SP_LOW:  0x0100,
+		SP_HIGH: 0x01FF,
+		SP:      0xFF,
+	}
 }
 
 func (c *CPU) setStatusCarry(flag bool) {
@@ -54,12 +60,6 @@ func (c *CPU) setStatusNegative(flag bool) {
 
 func (c *CPU) getStatusNegative() bool {
 	return c.S&0x80 == 0x80
-}
-
-func toInt16(data []byte) (ret uint16) {
-	buf := bytes.NewBuffer(data)
-	binary.Read(buf, binary.LittleEndian, &ret)
-	return
 }
 
 func (cpu *CPU) Start(PCH byte, PCL byte) {

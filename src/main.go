@@ -21,7 +21,7 @@ func main() {
 		os.Exit(0)
 	}()
 
-	memory, startPCH, startPCL := loadFile("2_loop.prg")
+	memory, startPCH, startPCL := loadFile("3_subroutine.prg")
 	cpu := newCPU(&memory)
 	display := newMemoryDisplay(&memory)
 
