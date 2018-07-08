@@ -24,13 +24,13 @@ func loadFile(path string) (RAM.Memory, byte, byte) {
 
 	startPCH := byteContent[0]
 	startPCL := byteContent[1]
-	startAddress := n.ToInt16([]byte{startPCL, startPCH})
+	startAddress := n.ToInt16([]byte{startPCH, startPCL})
 
 	currentAddress := startAddress
 	for i := 2; i < len(byteContent); i++ {
 		result.WriteAbsolute(currentAddress, byteContent[i])
 		currentAddress++
 	}
-	//fmt.Printf("%08b", b)
+
 	return result, startPCH, startPCL
 }

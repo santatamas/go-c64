@@ -64,12 +64,12 @@ func (c *CPU) getStatusNegative() bool {
 	return c.S&0x80 == 0x80
 }
 
-func (cpu *CPU) Start(PCH byte, PCL byte) {
+func (cpu *CPU) Start(PCL byte, PCH byte) {
 	// initialise an instruction type map
 	instrTypes := assemblyInstructions()
 
 	// Get the initial value of the program counter
-	cpu.PC = n.ToInt16([]byte{PCL, PCH})
+	cpu.PC = n.ToInt16_2(PCH, PCL)
 	log.Printf("Start address: %x \n", cpu.PC)
 	for {
 		log.Printf("Current PC address: %x \n", cpu.PC)
