@@ -23,7 +23,7 @@ func main() {
 		os.Exit(0)
 	}()
 
-	memory, startPCH, startPCL := loadFile("2_loop.prg")
+	memory, startPCH, startPCL := loadFile("./_resources/Prg/2_loop.prg")
 	cpu := MOS6510.NewCPU(&memory)
 	display := VIC2.NewMemoryDisplay(&memory)
 
