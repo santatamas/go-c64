@@ -80,10 +80,10 @@ func (cpu *CPU) Start(PCH byte, PCL byte) {
 
 		// Resolve instruction by instruction code
 		instruction := instrTypes(instrCode)
+
+		cpu.callMethod(instruction)
 		if instruction.Type == BRK {
 			break
 		}
-
-		cpu.callMethod(instruction)
 	}
 }

@@ -31,39 +31,47 @@ func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
 
 func (cpu *CPU) BNE(mode AddressingMode) {
 	log.Println("BNE called")
-	cpu.PC++
+	if !cpu.getStatusZero() {
+		hi := int8(cpu.memory.ReadAbsolute(cpu.PC))
+		log.Println("Moving PC address by: ", hi)
+
+		cpu.PC += uint16(hi) + 1
+	}
 }
 
 func (cpu *CPU) BRK(mode AddressingMode) {
 	// Do nothing apparently?
-	log.Println("BRK called")
+	log.Println("BRK called -- do nothing")
 }
 
 func (cpu *CPU) CPX(mode AddressingMode) {
-	log.Println("CPX called")
+	log.Println("CPX called -- adr.mode: ", mode)
 	if mode == Immidiate {
 		aa := cpu.memory.ReadAbsolute(cpu.PC)
+		log.Println("Value to compare with X: ", aa)
 		cpu.PC++
 
-		bb := cpu.memory.ReadAbsolute(cpu.PC)
-		cpu.PC++
+		//bb := cpu.memory.ReadAbsolute(cpu.PC)
+		//cpu.PC++
 
-		cc := cpu.memory.ReadAbsolute(toInt16([]byte{aa, bb}))
-		cpu.setStatusZero(cc == cpu.X)
-		cpu.PC++
+		//cc := cpu.memory.ReadAbsolute(toInt16([]byte{aa, bb}))
+
+		tmp := cpu.X - aa
+
+		cpu.setStatusZero(tmp == 0)
+		cpu.setStatusNegative(tmp < 0)
+		cpu.setStatusCarry(cpu.X >= aa)
 	}
 }
 
 func (cpu *CPU) INX(mode AddressingMode) {
 	log.Println("INX called")
 	cpu.X++
-	cpu.PC++
 }
 
 func (cpu *CPU) INY(mode AddressingMode) {
 	log.Println("INY called")
 	cpu.Y++
-	cpu.PC++
 }
 
 func (cpu *CPU) LDA(mode AddressingMode) {
@@ -77,35 +85,55 @@ func (cpu *CPU) LDA(mode AddressingMode) {
 
 func (cpu *CPU) LDX(mode AddressingMode) {
 	log.Println("LDX called")
+	if mode == Immidiate {
+		cpu.X = cpu.memory.ReadAbsolute(cpu.PC)
+		log.Printf("Value loaded to CPU register X: %x \n", cpu.X)
+		cpu.PC++
+	}
 }
 
 func (cpu *CPU) STA(mode AddressingMode) {
-	log.Println("STA called")
+	log.Println("STA called -- adr. mode: ", mode)
+
+	hi := cpu.memory.ReadAbsolute(cpu.PC)
+	cpu.PC++
+
+	lo := cpu.memory.ReadAbsolute(cpu.PC)
+	cpu.PC++
+
 	if mode == Absolute {
-		cpu.Y = cpu.memory.ReadAbsolute(cpu.PC)
-		cpu.PC++
-
-		cpu.X = cpu.memory.ReadAbsolute(cpu.PC)
-		cpu.PC++
-
 		log.Println("CPU register A value: ", cpu.A)
-		log.Println("Setting CPU register A to address: ", toInt16([]byte{cpu.Y, cpu.X}))
-		cpu.memory.WriteAbsolute(toInt16([]byte{cpu.Y, cpu.X}), cpu.A)
+		log.Println("Setting CPU register A to address: ", toInt16([]byte{hi, lo}))
+		cpu.memory.WriteAbsolute(toInt16([]byte{hi, lo}), cpu.A)
+	}
+
+	if mode == AbsoluteX {
+		hi += cpu.X
+		log.Println("CPU register A value: ", cpu.A)
+		log.Println("Setting CPU register A to address: ", toInt16([]byte{hi, lo}))
+		cpu.memory.WriteAbsolute(toInt16([]byte{hi, lo}), cpu.A)
+	}
+
+	if mode == AbsoluteY {
+		hi += cpu.Y
+		log.Println("CPU register A value: ", cpu.A)
+		log.Println("Setting CPU register A to address: ", toInt16([]byte{hi, lo}))
+		cpu.memory.WriteAbsolute(toInt16([]byte{hi, lo}), cpu.A)
 	}
 }
 
 func (cpu *CPU) TAY(mode AddressingMode) {
-	log.Println("TAY called")
-	if mode == Absolute {
+	log.Println("TAY called -- adr. mode: ", mode)
+	if mode == Implied {
+		log.Println("Setting CPU register Y to value: ", cpu.A)
 		cpu.Y = cpu.A
-		cpu.PC++
 	}
 }
 
 func (cpu *CPU) TYA(mode AddressingMode) {
-	log.Println("TYA called")
-	if mode == Absolute {
+	log.Println("TYA called -- adr. mode: ", mode)
+	if mode == Implied {
+		log.Println("Setting CPU register A to value: ", cpu.Y)
 		cpu.A = cpu.Y
-		cpu.PC++
 	}
 }

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 )
@@ -143,7 +142,6 @@ func asciiCharacters() func(byte) rune {
 	lines := strings.Split(charList, "\n")
 
 	for _, line := range lines {
-		fmt.Println(line)
 		parts := strings.Split(line, "|")
 		if len(parts) < 3 {
 			continue

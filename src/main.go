@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-	file, _ := os.OpenFile("log.txt", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	file, _ := os.OpenFile("log.txt", os.O_CREATE|os.O_WRONLY, 0666)
 	log.SetOutput(file)
 
 	c := make(chan os.Signal)
@@ -21,7 +21,7 @@ func main() {
 		os.Exit(0)
 	}()
 
-	memory, startPCH, startPCL := loadFile("1_first.prg")
+	memory, startPCH, startPCL := loadFile("2_loop.prg")
 	cpu := newCPU(&memory)
 	display := newMemoryDisplay(&memory)
 
