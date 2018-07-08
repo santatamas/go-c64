@@ -1,4 +1,4 @@
-package main
+package MOS6510
 
 import "log"
 

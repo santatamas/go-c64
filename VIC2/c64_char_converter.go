@@ -1,4 +1,4 @@
-package main
+package VIC2
 
 import (
 	"strconv"

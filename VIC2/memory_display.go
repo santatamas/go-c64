@@ -1,20 +1,21 @@
-package main
+package VIC2
 
 import (
 	"fmt"
+	"github.com/santatamas/go-c64/RAM"
 	"time"
 )
 
 type MemoryDisplay struct {
 	screenStartAddress uint16
 	colorStartAddress  uint16
-	memory             *Memory
+	memory             *RAM.Memory
 	width              int
 	height             int
 	c64Characters      func(byte) rune
 }
 
-func newMemoryDisplay(memory *Memory) MemoryDisplay {
+func NewMemoryDisplay(memory *RAM.Memory) MemoryDisplay {
 	result := MemoryDisplay{0x400, 0xD800, memory, 40, 25, asciiCharacters()}
 	return result
 }

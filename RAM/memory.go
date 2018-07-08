@@ -1,10 +1,10 @@
-package main
+package RAM
 
 type Memory struct {
 	memory []byte
 }
 
-func newMemory() Memory {
+func NewMemory() Memory {
 	return Memory{make([]byte, 65536)}
 }
 

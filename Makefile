@@ -1,8 +1,8 @@
 .PHONY: build run
 
 build:
-	cd src; go build -o ../dist/main
+	go build -o ./dist/main
 
 run:
-	cd src; go build -o ../dist/main; cd ..
+	go build -o ./dist/main
 	./dist/main

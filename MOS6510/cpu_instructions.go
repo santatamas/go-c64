@@ -1,6 +1,7 @@
-package main
+package MOS6510
 
 import (
+	n "github.com/santatamas/go-c64/numeric"
 	"log"
 )
 
@@ -41,10 +42,10 @@ func (cpu *CPU) JSR(mode AddressingMode) {
 	lo := cpu.memory.ReadAbsolute(cpu.PC)
 	cpu.PC++
 
-	cpu.stackPush(getHI(cpu.PC))
-	cpu.stackPush(getLO(cpu.PC))
+	cpu.stackPush(n.GetHI(cpu.PC))
+	cpu.stackPush(n.GetLO(cpu.PC))
 
-	cpu.PC = toInt16_2(hi, lo)
+	cpu.PC = n.ToInt16_2(hi, lo)
 }
 
 func (cpu *CPU) BNE(mode AddressingMode) {
@@ -130,22 +131,22 @@ func (cpu *CPU) STA(mode AddressingMode) {
 
 	if mode == Absolute {
 		log.Println("CPU register A value: ", cpu.A)
-		log.Println("Setting CPU register A to address: ", toInt16([]byte{hi, lo}))
-		cpu.memory.WriteAbsolute(toInt16([]byte{hi, lo}), cpu.A)
+		log.Println("Setting CPU register A to address: ", n.ToInt16([]byte{hi, lo}))
+		cpu.memory.WriteAbsolute(n.ToInt16([]byte{hi, lo}), cpu.A)
 	}
 
 	if mode == AbsoluteX {
 		hi += cpu.X
 		log.Println("CPU register A value: ", cpu.A)
-		log.Println("Setting CPU register A to address: ", toInt16([]byte{hi, lo}))
-		cpu.memory.WriteAbsolute(toInt16([]byte{hi, lo}), cpu.A)
+		log.Println("Setting CPU register A to address: ", n.ToInt16([]byte{hi, lo}))
+		cpu.memory.WriteAbsolute(n.ToInt16([]byte{hi, lo}), cpu.A)
 	}
 
 	if mode == AbsoluteY {
 		hi += cpu.Y
 		log.Println("CPU register A value: ", cpu.A)
-		log.Println("Setting CPU register A to address: ", toInt16([]byte{hi, lo}))
-		cpu.memory.WriteAbsolute(toInt16([]byte{hi, lo}), cpu.A)
+		log.Println("Setting CPU register A to address: ", n.ToInt16([]byte{hi, lo}))
+		cpu.memory.WriteAbsolute(n.ToInt16([]byte{hi, lo}), cpu.A)
 	}
 }
 

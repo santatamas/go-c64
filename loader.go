@@ -2,13 +2,15 @@ package main
 
 import (
 	"fmt"
+	"github.com/santatamas/go-c64/RAM"
+	n "github.com/santatamas/go-c64/numeric"
 	"io/ioutil"
 	"log"
 	"os"
 )
 
-func loadFile(path string) (Memory, byte, byte) {
-	result := newMemory()
+func loadFile(path string) (RAM.Memory, byte, byte) {
+	result := RAM.NewMemory()
 
 	file, err := os.Open(path)
 	if err != nil {
@@ -22,7 +24,7 @@ func loadFile(path string) (Memory, byte, byte) {
 
 	startPCH := byteContent[0]
 	startPCL := byteContent[1]
-	startAddress := toInt16([]byte{startPCL, startPCH})
+	startAddress := n.ToInt16([]byte{startPCL, startPCH})
 
 	currentAddress := startAddress
 	for i := 2; i < len(byteContent); i++ {

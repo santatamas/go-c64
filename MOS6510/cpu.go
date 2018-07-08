@@ -1,11 +1,13 @@
-package main
+package MOS6510
 
 import (
+	"github.com/santatamas/go-c64/RAM"
+	n "github.com/santatamas/go-c64/numeric"
 	"log"
 )
 
 type CPU struct {
-	memory  *Memory
+	memory  *RAM.Memory
 	A       byte
 	Y       byte // low
 	X       byte // high
@@ -17,7 +19,7 @@ type CPU struct {
 	SP_HIGH uint16
 }
 
-func newCPU(mem *Memory) CPU {
+func NewCPU(mem *RAM.Memory) CPU {
 	return CPU{
 		memory:  mem,
 		SP_LOW:  0x0100,
@@ -67,7 +69,7 @@ func (cpu *CPU) Start(PCH byte, PCL byte) {
 	instrTypes := assemblyInstructions()
 
 	// Get the initial value of the program counter
-	cpu.PC = toInt16([]byte{PCL, PCH})
+	cpu.PC = n.ToInt16([]byte{PCL, PCH})
 	log.Printf("Start address: %x \n", cpu.PC)
 	for {
 		log.Printf("Current PC address: %x \n", cpu.PC)

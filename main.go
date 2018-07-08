@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/santatamas/go-c64/MOS6510"
+	"github.com/santatamas/go-c64/VIC2"
 	"log"
 	"os"
 	"os/signal"
@@ -21,9 +23,9 @@ func main() {
 		os.Exit(0)
 	}()
 
-	memory, startPCH, startPCL := loadFile("3_subroutine.prg")
-	cpu := newCPU(&memory)
-	display := newMemoryDisplay(&memory)
+	memory, startPCH, startPCL := loadFile("2_loop.prg")
+	cpu := MOS6510.NewCPU(&memory)
+	display := VIC2.NewMemoryDisplay(&memory)
 
 	go cpu.Start(startPCH, startPCL)
 	display.Start()
