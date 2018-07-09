@@ -27,6 +27,8 @@ func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
 		cpu.STA(instruction.AddressingMode)
 	case TAY:
 		cpu.TAY(instruction.AddressingMode)
+	case TAX:
+		cpu.TAX(instruction.AddressingMode)
 	case TYA:
 		cpu.TYA(instruction.AddressingMode)
 	case JSR:
@@ -39,23 +41,56 @@ func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
 		cpu.ADC(instruction.AddressingMode)
 	case RTS:
 		cpu.RTS(instruction.AddressingMode)
+	case DEX:
+		cpu.DEX(instruction.AddressingMode)
+	case DEY:
+		cpu.DEY(instruction.AddressingMode)
+	case BPL:
+		cpu.BPL(instruction.AddressingMode)
 	}
 }
 
 func (cpu *CPU) RTS(mode AddressingMode) {
 	log.Println("RTS called")
+	lo := cpu.stackPop()
+	hi := cpu.stackPop()
+
+	cpu.PC = n.ToInt16_2(lo, hi)
+	cpu.PC++
 }
 
 func (cpu *CPU) ADC(mode AddressingMode) {
 	log.Println("ADC called -- adr. mode: ", mode)
 	if mode == ZeroPage {
 		log.Println("Zeropage called")
+		hi := cpu.memory.ReadAbsolute(cpu.PC)
+		if cpu.getStatusCarry() == true {
+			hi++
+		}
+		cpu.A = cpu.A + hi
+		//TODO set carry properly
+		cpu.PC++
 	}
 }
 
 func (cpu *CPU) BCS(mode AddressingMode) {
 	log.Println("BCS called")
-	cpu.PC++
+	if cpu.getStatusCarry() == true {
+		hi := int8(cpu.memory.ReadAbsolute(cpu.PC))
+		log.Println("Moving PC address by: ", hi)
+
+		cpu.PC += uint16(hi) + 1
+	}
+}
+
+func (cpu *CPU) BPL(mode AddressingMode) {
+	log.Println("BPL called")
+	if cpu.getStatusNegative() == false {
+		hi := int8(cpu.memory.ReadAbsolute(cpu.PC))
+		log.Println("Moving PC address by: ", hi)
+
+		cpu.PC += uint16(hi) + 1
+	}
 }
 
 func (cpu *CPU) ASL(mode AddressingMode) {
@@ -106,6 +141,16 @@ func (cpu *CPU) CPX(mode AddressingMode) {
 		cpu.setStatusNegative(tmp < 0)
 		cpu.setStatusCarry(cpu.X >= aa)
 	}
+}
+
+func (cpu *CPU) DEX(mode AddressingMode) {
+	log.Println("DEX called")
+	cpu.X--
+}
+
+func (cpu *CPU) DEY(mode AddressingMode) {
+	log.Println("DEY called")
+	cpu.Y--
 }
 
 func (cpu *CPU) INX(mode AddressingMode) {
@@ -182,6 +227,14 @@ func (cpu *CPU) STA(mode AddressingMode) {
 		cpu.memory.WriteAbsolute(n.ToInt16([]byte{hi, lo}), cpu.A)
 	}
 
+}
+
+func (cpu *CPU) TAX(mode AddressingMode) {
+	log.Println("TAX called -- adr. mode: ", mode)
+	if mode == Implied {
+		log.Println("Setting CPU register X to value: ", cpu.A)
+		cpu.X = cpu.A
+	}
 }
 
 func (cpu *CPU) TAY(mode AddressingMode) {
