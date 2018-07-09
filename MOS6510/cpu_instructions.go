@@ -31,31 +31,52 @@ func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
 		cpu.TYA(instruction.AddressingMode)
 	case JSR:
 		cpu.JSR(instruction.AddressingMode)
+	case ASL:
+		cpu.ASL(instruction.AddressingMode)
+	case BCS:
+		cpu.BCS(instruction.AddressingMode)
+	case ADC:
+		cpu.ADC(instruction.AddressingMode)
+	case RTS:
+		cpu.RTS(instruction.AddressingMode)
+	}
+}
+
+func (cpu *CPU) RTS(mode AddressingMode) {
+	log.Println("RTS called")
+}
+
+func (cpu *CPU) ADC(mode AddressingMode) {
+	log.Println("ADC called -- adr. mode: ", mode)
+	if mode == ZeroPage {
+		log.Println("Zeropage called")
+	}
+}
+
+func (cpu *CPU) BCS(mode AddressingMode) {
+	log.Println("BCS called")
+	cpu.PC++
+}
+
+func (cpu *CPU) ASL(mode AddressingMode) {
+	log.Println("ASL called -- adr. mode: ", mode)
+	if mode == Accumulator {
+		cpu.A = cpu.A << 1
 	}
 }
 
 func (cpu *CPU) JSR(mode AddressingMode) {
 	log.Println("JSR called")
-	log.Printf("PC address: %x", cpu.PC)
 	lo := cpu.memory.ReadAbsolute(cpu.PC)
 	cpu.PC++
 
-	pch := n.GetHI(cpu.PC)
-	pcl := n.GetLO(cpu.PC)
-
-	log.Printf("Current PCH: %x", pch)
-	log.Printf("Current PCL: %x", pcl)
-
-	cpu.stackPush(pch)
-	cpu.stackPush(pcl)
+	cpu.stackPush(n.GetHI(cpu.PC))
+	cpu.stackPush(n.GetLO(cpu.PC))
 
 	hi := cpu.memory.ReadAbsolute(cpu.PC)
 	cpu.PC++
 
-	log.Printf("PC address: %x", cpu.PC)
-
 	cpu.PC = n.ToInt16_2(lo, hi)
-	log.Printf("Jump PC address: %x", cpu.PC)
 }
 
 func (cpu *CPU) BNE(mode AddressingMode) {
@@ -130,21 +151,37 @@ func (cpu *CPU) STA(mode AddressingMode) {
 	hi := cpu.memory.ReadAbsolute(cpu.PC)
 	cpu.PC++
 
+	// Zeropage only needs a single byte address
+	if mode == ZeroPage {
+		log.Println("CPU register A value: ", cpu.A)
+		log.Println("Setting CPU register A to zero page address: ", hi)
+		cpu.memory.WriteZeroPage(hi, cpu.A)
+		return
+	}
+
 	lo := cpu.memory.ReadAbsolute(cpu.PC)
 	cpu.PC++
 
+	if mode == Absolute {
+		log.Println("CPU register A value: ", cpu.A)
+		log.Println("Setting CPU register A to address: ", n.ToInt16([]byte{hi, lo}))
+		cpu.memory.WriteAbsolute(n.ToInt16([]byte{hi, lo}), cpu.A)
+	}
+
 	if mode == AbsoluteX {
 		hi += cpu.X
+		log.Println("CPU register A value: ", cpu.A)
+		log.Println("Setting CPU register A to address: ", n.ToInt16([]byte{hi, lo}))
+		cpu.memory.WriteAbsolute(n.ToInt16([]byte{hi, lo}), cpu.A)
 	}
 
 	if mode == AbsoluteY {
 		hi += cpu.Y
+		log.Println("CPU register A value: ", cpu.A)
+		log.Println("Setting CPU register A to address: ", n.ToInt16([]byte{hi, lo}))
+		cpu.memory.WriteAbsolute(n.ToInt16([]byte{hi, lo}), cpu.A)
 	}
 
-	// if mode == Absolute
-	log.Println("CPU register A value: ", cpu.A)
-	log.Println("Setting CPU register A to address: ", n.ToInt16([]byte{hi, lo}))
-	cpu.memory.WriteAbsolute(n.ToInt16([]byte{hi, lo}), cpu.A)
 }
 
 func (cpu *CPU) TAY(mode AddressingMode) {
