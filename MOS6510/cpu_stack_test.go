@@ -6,44 +6,65 @@ import (
 	"github.com/santatamas/go-c64/RAM"
 )
 
-func TestCPU_stackPush(t *testing.T) {
-	type fields struct {
-		memory  *RAM.Memory
-		A       byte
-		Y       byte
-		X       byte
-		S       byte
-		P       byte
-		PC      uint16
-		SP      byte
-		SP_LOW  uint16
-		SP_HIGH uint16
+func TestCPU_stackPush_happypath(t *testing.T) {
+	// Arrange
+	memory := RAM.NewMemory()
+	cpu := NewCPU(&memory)
+
+	// Act
+	cpu.stackPush(100)
+
+	// Assert
+	if cpu.SP != 0xFE {
+		t.Errorf("Stack pointer value was incorrect, got: %d, want: %d.", cpu.SP, 0xFE)
 	}
-	type args struct {
-		value byte
+}
+
+func TestCPU_stackPush_overflow(t *testing.T) {
+	// Arrange
+	memory := RAM.NewMemory()
+	cpu := NewCPU(&memory)
+
+	// Act
+	for i := 0; i < 255; i++ {
+		cpu.stackPush(100)
 	}
-	tests := []struct {
-		name   string
-		fields fields
-		args   args
-	}{
-	// TODO: Add test cases.
+
+	err := cpu.stackPush(100)
+
+	// Assert
+	if err == nil {
+		t.Error("Expected a stackoverflow error, got nothing.")
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			c := &CPU{
-				memory:  tt.fields.memory,
-				A:       tt.fields.A,
-				Y:       tt.fields.Y,
-				X:       tt.fields.X,
-				S:       tt.fields.S,
-				P:       tt.fields.P,
-				PC:      tt.fields.PC,
-				SP:      tt.fields.SP,
-				SP_LOW:  tt.fields.SP_LOW,
-				SP_HIGH: tt.fields.SP_HIGH,
-			}
-			c.stackPush(tt.args.value)
-		})
+}
+
+func TestCPU_stackPop_underflow(t *testing.T) {
+	// Arrange
+	memory := RAM.NewMemory()
+	cpu := NewCPU(&memory)
+	cpu.stackPush(100)
+
+	// Act
+	cpu.stackPop()
+	_, err := cpu.stackPop()
+
+	// Assert
+	if err == nil {
+		t.Error("Expected a stack underflow error, got nothing.")
+	}
+}
+
+func TestCPU_stackPop_happypath(t *testing.T) {
+	// Arrange
+	memory := RAM.NewMemory()
+	cpu := NewCPU(&memory)
+	cpu.stackPush(100)
+
+	// Act
+	result, _ := cpu.stackPop()
+
+	// Assert
+	if result != 100 {
+		t.Errorf("Stack value was incorrect, got: %d, want: %d.", result, 100)
 	}
 }

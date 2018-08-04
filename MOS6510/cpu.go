@@ -64,6 +64,11 @@ func (c *CPU) getStatusNegative() bool {
 	return c.S&0x80 == 0x80
 }
 
+func getTestCPU() (result CPU) {
+	memory := RAM.NewMemory()
+	return NewCPU(&memory)
+}
+
 func (cpu *CPU) Start(PCL byte, PCH byte) {
 	// initialise an instruction type map
 	instrTypes := assemblyInstructions()

@@ -52,23 +52,38 @@ func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
 
 func (cpu *CPU) RTS(mode AddressingMode) {
 	log.Println("RTS called")
-	lo := cpu.stackPop()
-	hi := cpu.stackPop()
+	lo, _ := cpu.stackPop()
+	hi, _ := cpu.stackPop()
 
 	cpu.PC = n.ToInt16_2(lo, hi)
 	cpu.PC++
 }
 
+// Operation:  A + M + C -> A, C
 func (cpu *CPU) ADC(mode AddressingMode) {
 	log.Println("ADC called -- adr. mode: ", mode)
 	if mode == ZeroPage {
 		log.Println("Zeropage called")
 		hi := cpu.memory.ReadAbsolute(cpu.PC)
+
+		result := hi
 		if cpu.getStatusCarry() == true {
-			hi++
+			result++
 		}
-		cpu.A = cpu.A + hi
-		//TODO set carry properly
+
+		result = cpu.A + result
+
+		if result > 255 {
+			cpu.setStatusCarry(true)
+		} else {
+			cpu.setStatusCarry(false)
+		}
+
+		//cpu.set
+
+		//setV(!((A ^ op) & 0x80) && ((A ^ sum) & 0x80));
+
+		cpu.A = result
 		cpu.PC++
 	}
 }
