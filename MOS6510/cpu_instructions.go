@@ -57,6 +57,8 @@ func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
 		cpu.INC(instruction.AddressingMode)
 	case JMP:
 		cpu.JMP(instruction.AddressingMode)
+	case CMP:
+		cpu.CMP(instruction.AddressingMode)
 	}
 }
 
@@ -71,10 +73,9 @@ func (cpu *CPU) RTS(mode AddressingMode) {
 
 // Operation:  A + M + C -> A, C
 func (cpu *CPU) ADC(mode AddressingMode) {
-	log.Println("ADC called -- adr. mode: ", mode)
+	log.Println("ADC called -- adr. mode: ", mode.toString())
 	if mode == ZeroPage {
 		log.Println("Zeropage called")
-		//hi := cpu.memory.ReadZeroPage(cpu.PC)
 		zpAdr := cpu.memory.ReadAbsolute(cpu.PC)
 		hi := cpu.memory.ReadZeroPage(zpAdr)
 
@@ -93,7 +94,6 @@ func (cpu *CPU) ADC(mode AddressingMode) {
 
 		isOverflow := (((cpu.A ^ hi) & 0x80) == 0) && ((cpu.A^result)&0x80) > 0
 		cpu.setStatusOverflow(isOverflow)
-
 		cpu.setStatusZero(result == 0)
 
 		cpu.A = result
@@ -129,7 +129,7 @@ func (cpu *CPU) BPL(mode AddressingMode) {
 }
 
 func (cpu *CPU) ASL(mode AddressingMode) {
-	log.Println("ASL called -- adr. mode: ", mode)
+	log.Println("ASL called -- adr. mode: ", mode.toString())
 	if mode == Accumulator {
 
 		carryValue := cpu.A & 0x80
@@ -179,7 +179,7 @@ func (cpu *CPU) BRK(mode AddressingMode) {
 }
 
 func (cpu *CPU) CPX(mode AddressingMode) {
-	log.Println("CPX called -- adr.mode: ", mode)
+	log.Println("CPX called -- adr.mode: ", mode.toString())
 	if mode == Immidiate {
 		aa := cpu.memory.ReadAbsolute(cpu.PC)
 		log.Println("Value to compare with X: ", aa)
@@ -253,7 +253,7 @@ func (cpu *CPU) LDY(mode AddressingMode) {
 }
 
 func (cpu *CPU) STA(mode AddressingMode) {
-	log.Println("STA called -- adr. mode: ", mode)
+	log.Println("STA called -- adr. mode: ", mode.toString())
 
 	hi := cpu.memory.ReadAbsolute(cpu.PC)
 	cpu.PC++
@@ -292,7 +292,7 @@ func (cpu *CPU) STA(mode AddressingMode) {
 }
 
 func (cpu *CPU) STX(mode AddressingMode) {
-	log.Println("STX called -- adr. mode: ", mode)
+	log.Println("STX called -- adr. mode: ", mode.toString())
 
 	hi := cpu.memory.ReadAbsolute(cpu.PC)
 	cpu.PC++
@@ -322,7 +322,7 @@ func (cpu *CPU) STX(mode AddressingMode) {
 }
 
 func (cpu *CPU) TAX(mode AddressingMode) {
-	log.Println("TAX called -- adr. mode: ", mode)
+	log.Println("TAX called -- adr. mode: ", mode.toString())
 	if mode == Implied {
 		log.Println("Setting CPU register X to value: ", cpu.A)
 
@@ -334,7 +334,7 @@ func (cpu *CPU) TAX(mode AddressingMode) {
 }
 
 func (cpu *CPU) TXA(mode AddressingMode) {
-	log.Println("TXA called -- adr. mode: ", mode)
+	log.Println("TXA called -- adr. mode: ", mode.toString())
 	if mode == Implied {
 		log.Println("Setting CPU register A to value: ", cpu.X)
 
@@ -346,7 +346,7 @@ func (cpu *CPU) TXA(mode AddressingMode) {
 }
 
 func (cpu *CPU) TAY(mode AddressingMode) {
-	log.Println("TAY called -- adr. mode: ", mode)
+	log.Println("TAY called -- adr. mode: ", mode.toString())
 	if mode == Implied {
 		log.Println("Setting CPU register Y to value: ", cpu.A)
 
@@ -358,7 +358,7 @@ func (cpu *CPU) TAY(mode AddressingMode) {
 }
 
 func (cpu *CPU) TYA(mode AddressingMode) {
-	log.Println("TYA called -- adr. mode: ", mode)
+	log.Println("TYA called -- adr. mode: ", mode.toString())
 	if mode == Implied {
 		log.Println("Setting CPU register A to value: ", cpu.Y)
 
@@ -370,7 +370,7 @@ func (cpu *CPU) TYA(mode AddressingMode) {
 }
 
 func (cpu *CPU) AND(mode AddressingMode) {
-	log.Println("AND called -- adr. mode: ", mode)
+	log.Println("AND called -- adr. mode: ", mode.toString())
 	if mode == Immidiate {
 		log.Println("Immidiate mode")
 		mem := cpu.memory.ReadAbsolute(cpu.PC)
@@ -387,7 +387,7 @@ func (cpu *CPU) AND(mode AddressingMode) {
 }
 
 func (cpu *CPU) INC(mode AddressingMode) {
-	log.Println("INC called -- adr. mode: ", mode)
+	log.Println("INC called -- adr. mode: ", mode.toString())
 	if mode == Absolute {
 		log.Println("Absolute mode")
 
@@ -405,7 +405,7 @@ func (cpu *CPU) INC(mode AddressingMode) {
 }
 
 func (cpu *CPU) JMP(mode AddressingMode) {
-	log.Println("JMP called -- adr. mode: ", mode)
+	log.Println("JMP called -- adr. mode: ", mode.toString())
 	if mode == Absolute {
 		log.Println("Absolute mode")
 		hi := cpu.memory.ReadAbsolute(cpu.PC)
@@ -414,5 +414,23 @@ func (cpu *CPU) JMP(mode AddressingMode) {
 		cpu.PC++
 
 		cpu.PC = n.ToInt16([]byte{hi, lo})
+	}
+}
+
+func (cpu *CPU) CMP(mode AddressingMode) {
+	log.Println("CMP called -- adr. mode: ", mode.toString())
+	if mode == Immidiate {
+		log.Println("Immidiate mode")
+		mem := cpu.memory.ReadAbsolute(cpu.PC)
+		log.Println("mem value: ", mem)
+		log.Println("CPU.A value: ", cpu.A)
+		result := cpu.A - mem
+		log.Println("result value:", result)
+
+		cpu.setStatusZero(result == 0)
+		cpu.setStatusNegative(result&0x80 == 128)
+		cpu.setStatusCarry(cpu.A >= mem)
+
+		cpu.PC++
 	}
 }
