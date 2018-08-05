@@ -165,12 +165,14 @@ func (cpu *CPU) JSR(mode AddressingMode) {
 }
 
 func (cpu *CPU) BNE(mode AddressingMode) {
-	log.Println("BNE called")
+	log.Println("BNE called -- adr.mode: ", mode.toString())
 	if !cpu.getStatusZero() {
 		hi := int8(cpu.memory.ReadAbsolute(cpu.PC))
 		log.Println("Moving PC address by: ", hi)
 
 		cpu.PC += uint16(hi) + 1
+	} else {
+		cpu.PC++
 	}
 }
 
@@ -226,11 +228,27 @@ func (cpu *CPU) INY(mode AddressingMode) {
 }
 
 func (cpu *CPU) LDA(mode AddressingMode) {
-	log.Println("LDA called")
+	log.Println("LDA called -- adr. mode: ", mode.toString())
 	if mode == Immidiate {
 		cpu.A = cpu.memory.ReadAbsolute(cpu.PC)
 		log.Printf("Value loaded to CPU register A: %x \n", cpu.A)
 		cpu.PC++
+
+		cpu.setStatusZero(cpu.A == 0)
+		cpu.setStatusNegative(cpu.A&0x80 == 128)
+	}
+
+	if mode == Absolute {
+		hi := cpu.memory.ReadAbsolute(cpu.PC)
+		cpu.PC++
+		lo := cpu.memory.ReadAbsolute(cpu.PC)
+		cpu.PC++
+
+		cpu.A = cpu.memory.ReadAbsolute(n.ToInt16([]byte{hi, lo}))
+		log.Printf("Value loaded to CPU register A: %x \n", cpu.A)
+
+		cpu.setStatusZero(cpu.A == 0)
+		cpu.setStatusNegative(cpu.A&0x80 == 128)
 	}
 }
 
@@ -432,5 +450,22 @@ func (cpu *CPU) CMP(mode AddressingMode) {
 		cpu.setStatusCarry(cpu.A >= mem)
 
 		cpu.PC++
+	}
+
+	if mode == Absolute {
+		hi := cpu.memory.ReadAbsolute(cpu.PC)
+		cpu.PC++
+		lo := cpu.memory.ReadAbsolute(cpu.PC)
+		cpu.PC++
+
+		mem := cpu.memory.ReadAbsolute(n.ToInt16([]byte{hi, lo}))
+		log.Println("mem value: ", mem)
+		log.Println("CPU.A value: ", cpu.A)
+		result := cpu.A - mem
+		log.Println("result value:", result)
+
+		cpu.setStatusZero(result == 0)
+		cpu.setStatusNegative(result&0x80 == 128)
+		cpu.setStatusCarry(cpu.A >= mem)
 	}
 }

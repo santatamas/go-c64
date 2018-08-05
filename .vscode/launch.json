@@ -13,8 +13,11 @@
             "port": 2345,
             "host": "127.0.0.1",
             "program": "${workspaceFolder}/main.go",
-            "env": {},
+            "internalConsoleOptions": "openOnSessionStart",
             "args": [],
+            "env": {
+                "TERM": "xterm-16color"
+            },
             "showLog": true,
             "trace":true
         }
