@@ -6,7 +6,7 @@ import (
 )
 
 var charList = `
-@| |  0
+ | |  0
 A|a|  1
 B|b|  2
 I|i|  9
@@ -153,7 +153,7 @@ func asciiCharacters() func(byte) rune {
 		p3Num, _ := strconv.Atoi(p3)
 
 		if len(p1) == 0 {
-			innerMap[byte(p3Num)] = '*'
+			innerMap[byte(p3Num)] = ' '
 		} else {
 			innerMap[byte(p3Num)] = rune(p1[0])
 		}
@@ -162,6 +162,9 @@ func asciiCharacters() func(byte) rune {
 	return func(key byte) rune {
 
 		value := (byte)(key & 127)
+		if key == 129 {
+			return '∀'
+		}
 		//log.Println("Resolving character by bytecode: ", value)
 		//log.Println("Resolved char: ", innerMap[value])
 		return innerMap[value]
