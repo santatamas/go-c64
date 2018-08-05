@@ -28,42 +28,6 @@ func NewCPU(mem *RAM.Memory) CPU {
 	}
 }
 
-func (c *CPU) setStatusCarry(flag bool) {
-	if flag {
-		c.S |= 0x01
-	} else {
-		c.S &^= 0x01
-	}
-}
-
-func (c *CPU) getStatusCarry() bool {
-	return c.S&0x01 == 0x01
-}
-
-func (c *CPU) setStatusZero(flag bool) {
-	if flag {
-		c.S |= 0x02
-	} else {
-		c.S &^= 0x02
-	}
-}
-
-func (c *CPU) getStatusZero() bool {
-	return c.S&0x02 == 0x02
-}
-
-func (c *CPU) setStatusNegative(flag bool) {
-	if flag {
-		c.S |= 0x80
-	} else {
-		c.S &^= 0x80
-	}
-}
-
-func (c *CPU) getStatusNegative() bool {
-	return c.S&0x80 == 0x80
-}
-
 func getTestCPU() (result CPU) {
 	memory := RAM.NewMemory()
 	return NewCPU(&memory)
