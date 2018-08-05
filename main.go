@@ -12,7 +12,7 @@ func main() {
 	file, _ := os.OpenFile("log.txt", os.O_CREATE|os.O_WRONLY, 0666)
 	log.SetOutput(file)
 
-	memory, startPCH, startPCL := loadFile("./_resources/Prg/4_colors.prg")
+	memory, startPCH, startPCL := loadFile("./_resources/Phase1/Prg/4_colors.prg")
 	cpu := MOS6510.NewCPU(&memory)
 	display := VIC2.NewMemoryDisplay(&memory)
 
