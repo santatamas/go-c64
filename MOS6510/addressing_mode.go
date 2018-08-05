@@ -25,7 +25,7 @@ func (mode AddressingMode) toString() string {
 	case IndexedIndirectX:
 		return "IndexedIndirectX"
 	case IndirectIndexedY:
-		return "IndexedIndirectX"
+		return "IndirectIndexedY"
 	case Indirect:
 		return "Indirect"
 	case Absolute:

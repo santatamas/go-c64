@@ -59,6 +59,12 @@ func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
 		cpu.JMP(instruction.AddressingMode)
 	case CMP:
 		cpu.CMP(instruction.AddressingMode)
+	case BEQ:
+		cpu.BEQ(instruction.AddressingMode)
+	case SEC:
+		cpu.SEC(instruction.AddressingMode)
+	case SBC:
+		cpu.SBC(instruction.AddressingMode)
 	}
 }
 
@@ -176,6 +182,18 @@ func (cpu *CPU) BNE(mode AddressingMode) {
 	}
 }
 
+func (cpu *CPU) BEQ(mode AddressingMode) {
+	log.Println("BEQ called -- adr.mode: ", mode.toString())
+	if cpu.getStatusZero() {
+		hi := int8(cpu.memory.ReadAbsolute(cpu.PC))
+		log.Println("Moving PC address by: ", hi)
+
+		cpu.PC += uint16(hi) + 1
+	} else {
+		cpu.PC++
+	}
+}
+
 func (cpu *CPU) BRK(mode AddressingMode) {
 	log.Println("BRK called -- do nothing")
 }
@@ -250,6 +268,23 @@ func (cpu *CPU) LDA(mode AddressingMode) {
 		cpu.setStatusZero(cpu.A == 0)
 		cpu.setStatusNegative(cpu.A&0x80 == 128)
 	}
+
+	if mode == AbsoluteX {
+		hi := cpu.memory.ReadAbsolute(cpu.PC)
+		cpu.PC++
+		lo := cpu.memory.ReadAbsolute(cpu.PC)
+		cpu.PC++
+
+		memAdr := n.ToInt16([]byte{hi, lo})
+		memAdr += uint16(cpu.X)
+		log.Println("LDA - cpu.X: ", cpu.X)
+
+		cpu.A = cpu.memory.ReadAbsolute(memAdr)
+		log.Printf("Value loaded to CPU register A: %x \n", cpu.A)
+
+		cpu.setStatusZero(cpu.A == 0)
+		cpu.setStatusNegative(cpu.A&0x80 == 128)
+	}
 }
 
 func (cpu *CPU) LDX(mode AddressingMode) {
@@ -281,6 +316,49 @@ func (cpu *CPU) STA(mode AddressingMode) {
 		log.Println("CPU register A value: ", cpu.A)
 		log.Println("Setting CPU register A to zero page address: ", hi)
 		cpu.memory.WriteZeroPage(hi, cpu.A)
+		return
+	}
+
+	if mode == ZeroPageX {
+		hi += cpu.X
+		log.Println("CPU register A value: ", cpu.A)
+		log.Println("Setting CPU register A to zero page address: ", hi)
+		cpu.memory.WriteZeroPage(hi, cpu.A)
+		return
+	}
+
+	if mode == ZeroPageY {
+		hi += cpu.Y
+		log.Println("CPU register A value: ", cpu.A)
+		log.Println("Setting CPU register A to zero page address: ", hi)
+		cpu.memory.WriteZeroPage(hi, cpu.A)
+		return
+	}
+
+	if mode == IndirectIndexedY {
+		hiByte := cpu.memory.ReadZeroPage(hi)
+		hiByteNew := cpu.Y + hiByte
+		log.Println("hiByte: ", hiByteNew)
+		loByte := cpu.memory.ReadZeroPage(hi + 1)
+		if uint16(cpu.Y)+uint16(hiByte) > 255 {
+			loByte++
+		}
+		log.Println("loByte: ", loByte)
+		log.Println("CPU register A value: ", cpu.A)
+		log.Println("Setting CPU register A to zero page address: ", n.ToInt16([]byte{hiByteNew, loByte}))
+		cpu.memory.WriteAbsolute(n.ToInt16([]byte{hiByteNew, loByte}), cpu.A)
+		return
+	}
+
+	if mode == IndexedIndirectX {
+		addrHiByteOfLocation := hi + cpu.X
+		hiByte := cpu.memory.ReadZeroPage(addrHiByteOfLocation)
+		log.Println("hiByte: ", hiByte)
+		loByte := cpu.memory.ReadZeroPage(addrHiByteOfLocation + 1)
+		log.Println("loByte: ", loByte)
+		log.Println("CPU register A value: ", cpu.A)
+		log.Println("Setting CPU register A to zero page address: ", n.ToInt16([]byte{hiByte, loByte}))
+		cpu.memory.WriteAbsolute(n.ToInt16([]byte{hiByte, loByte}), cpu.A)
 		return
 	}
 
@@ -433,6 +511,24 @@ func (cpu *CPU) JMP(mode AddressingMode) {
 
 		cpu.PC = n.ToInt16([]byte{hi, lo})
 	}
+
+	if mode == Indirect {
+		log.Println("Indirect mode")
+
+		hi := cpu.memory.ReadAbsolute(cpu.PC)
+		cpu.PC++
+		lo := cpu.memory.ReadAbsolute(cpu.PC)
+		cpu.PC++
+
+		memAdr := n.ToInt16([]byte{hi, lo})
+		log.Println("Getting mem value from address: ", memAdr)
+
+		hiByte := cpu.memory.ReadAbsolute(memAdr)
+		loByte := cpu.memory.ReadAbsolute(memAdr + 1)
+		log.Println("Got value: ", loByte)
+
+		cpu.PC = n.ToInt16([]byte{hiByte, loByte})
+	}
 }
 
 func (cpu *CPU) CMP(mode AddressingMode) {
@@ -467,5 +563,54 @@ func (cpu *CPU) CMP(mode AddressingMode) {
 		cpu.setStatusZero(result == 0)
 		cpu.setStatusNegative(result&0x80 == 128)
 		cpu.setStatusCarry(cpu.A >= mem)
+	}
+
+	if mode == ZeroPage {
+		hi := cpu.memory.ReadAbsolute(cpu.PC)
+		cpu.PC++
+		mem := cpu.memory.ReadZeroPage(hi)
+		log.Println("mem value: ", mem)
+		log.Println("CPU.A value: ", cpu.A)
+		result := cpu.A - mem
+		log.Println("result value:", result)
+
+		cpu.setStatusZero(result == 0)
+		cpu.setStatusNegative(result&0x80 == 128)
+		cpu.setStatusCarry(cpu.A >= mem)
+	}
+}
+
+func (cpu *CPU) SEC(mode AddressingMode) {
+	log.Println("SEC called -- adr. mode: ", mode.toString())
+	cpu.setStatusCarry(true)
+}
+
+// Operation:  A - M - C -> A
+func (cpu *CPU) SBC(mode AddressingMode) {
+	log.Println("SBC called -- adr. mode: ", mode.toString())
+	if mode == Immidiate {
+
+		log.Println("Immidiate mode")
+		mem := cpu.memory.ReadAbsolute(cpu.PC)
+
+		result := cpu.A - mem
+		if cpu.getStatusCarry() == true {
+			result--
+		}
+
+		if uint16(cpu.A)-uint16(mem) < 255 {
+			cpu.setStatusCarry(true)
+		} else {
+			cpu.setStatusCarry(false)
+		}
+
+		isOverflow := (((cpu.A ^ mem) & 0x80) == 0) && ((cpu.A^result)&0x80) > 0
+		cpu.setStatusOverflow(isOverflow)
+		cpu.setStatusZero(result == 0)
+
+		cpu.A = result + 1 //why plus one?
+		log.Println("A register: ", cpu.A)
+		log.Println("CPU carry flag: ", cpu.getStatusCarry())
+		cpu.PC++
 	}
 }
