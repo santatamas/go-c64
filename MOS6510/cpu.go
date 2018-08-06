@@ -4,6 +4,7 @@ import (
 	"github.com/santatamas/go-c64/RAM"
 	n "github.com/santatamas/go-c64/numeric"
 	"log"
+	"time"
 )
 
 type CPU struct {
@@ -56,5 +57,6 @@ func (cpu *CPU) Start(PCL byte, PCH byte) {
 		if instruction.Type == BRK {
 			break
 		}
+		time.Sleep(5 * time.Millisecond)
 	}
 }
