@@ -13,13 +13,13 @@ func (c *CPU) stackPush(value byte) (err error) {
 
 	log.Printf("Pushing stack value: %x", value)
 	log.Printf("Pushing stack value to address: %x", c.SP_LOW+uint16(c.SP))
-	c.memory.WriteAbsolute(c.SP_LOW+uint16(c.SP), value)
+	c.Memory.WriteAbsolute(c.SP_LOW+uint16(c.SP), value)
 	return
 }
 
 func (c *CPU) stackPop() (result byte, err error) {
 	log.Printf("Popping stack value from address: %x", c.SP_LOW+uint16(c.SP))
-	result = c.memory.ReadAbsolute(c.SP_LOW + uint16(c.SP))
+	result = c.Memory.ReadAbsolute(c.SP_LOW + uint16(c.SP))
 	err = c.stackPointerInc()
 	return result, err
 }

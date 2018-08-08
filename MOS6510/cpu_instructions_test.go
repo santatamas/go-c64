@@ -24,8 +24,8 @@ func TestCPU_ADC_zeropage_noCarry(t *testing.T) {
 	// Arrange
 	cpu := getTestCPU()
 	cpu.PC = 1000
-	cpu.memory.WriteAbsolute(1000, 100)
-	cpu.memory.WriteZeroPage(100, 100)
+	cpu.Memory.WriteAbsolute(1000, 100)
+	cpu.Memory.WriteZeroPage(100, 100)
 
 	// Act
 	cpu.ADC(9)
@@ -44,8 +44,8 @@ func TestCPU_ADC_zeropage_initialCarry(t *testing.T) {
 	// Arrange
 	cpu := getTestCPU()
 	cpu.PC = 1000
-	cpu.memory.WriteAbsolute(1000, 100)
-	cpu.memory.WriteZeroPage(100, 100)
+	cpu.Memory.WriteAbsolute(1000, 100)
+	cpu.Memory.WriteZeroPage(100, 100)
 	cpu.setStatusCarry(true)
 
 	// Act
@@ -70,8 +70,8 @@ func TestCPU_ADC_zeropage_carryOver(t *testing.T) {
 	cpu := getTestCPU()
 	cpu.A = 255
 	cpu.PC = 1000
-	cpu.memory.WriteAbsolute(1000, 100)
-	cpu.memory.WriteZeroPage(100, 1)
+	cpu.Memory.WriteAbsolute(1000, 100)
+	cpu.Memory.WriteZeroPage(100, 1)
 	cpu.setStatusCarry(false)
 
 	// Act
@@ -100,8 +100,8 @@ func TestCPU_ADC_zeropage_overflow_set(t *testing.T) {
 	cpu := getTestCPU()
 	cpu.A = 127
 	cpu.PC = 1000
-	cpu.memory.WriteAbsolute(1000, 100)
-	cpu.memory.WriteZeroPage(100, 1)
+	cpu.Memory.WriteAbsolute(1000, 100)
+	cpu.Memory.WriteZeroPage(100, 1)
 	cpu.setStatusCarry(false)
 
 	// Act
@@ -122,7 +122,7 @@ func TestCPU_BCS_carrySet(t *testing.T) {
 	cpu := getTestCPU()
 	cpu.PC = 0
 	cpu.setStatusCarry(true)
-	cpu.memory.WriteZeroPage(0, 16)
+	cpu.Memory.WriteZeroPage(0, 16)
 
 	// Act
 	cpu.BCS(1)
@@ -137,7 +137,7 @@ func TestCPU_BCS_carryUnset(t *testing.T) {
 	// Arrange
 	cpu := getTestCPU()
 	cpu.PC = 0
-	cpu.memory.WriteZeroPage(0, 16)
+	cpu.Memory.WriteZeroPage(0, 16)
 
 	// Act
 	cpu.BCS(1)
@@ -153,7 +153,7 @@ func TestCPU_BPL_negativeSet(t *testing.T) {
 	cpu := getTestCPU()
 	cpu.PC = 0
 	cpu.setStatusNegative(false)
-	cpu.memory.WriteZeroPage(0, 16)
+	cpu.Memory.WriteZeroPage(0, 16)
 
 	// Act
 	cpu.BPL(1)
@@ -169,7 +169,7 @@ func TestCPU_BPL_negativeUnset(t *testing.T) {
 	cpu := getTestCPU()
 	cpu.PC = 0
 	cpu.setStatusNegative(true)
-	cpu.memory.WriteZeroPage(0, 16)
+	cpu.Memory.WriteZeroPage(0, 16)
 
 	// Act
 	cpu.BPL(1)
