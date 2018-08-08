@@ -5,6 +5,7 @@ import (
 	"github.com/santatamas/go-c64/MOS6510"
 	"github.com/santatamas/go-c64/RAM"
 	"github.com/santatamas/go-c64/VIC2"
+	"github.com/santatamas/go-c64/internals"
 	n "github.com/santatamas/go-c64/numeric"
 	"io/ioutil"
 	"log"
@@ -18,6 +19,8 @@ type Emulator struct {
 	Delay      time.Duration
 	cycleCount int64
 	pauseFlag  bool
+	Debug      bool
+	hub        *internals.Hub
 }
 
 func NewEmulator() Emulator {
@@ -32,6 +35,7 @@ func NewEmulator() Emulator {
 		Display:    &display,
 		cycleCount: 0,
 		pauseFlag:  false,
+		Debug:      false,
 	}
 }
 
@@ -42,6 +46,11 @@ func (emu *Emulator) Start() {
 				emu.CPU.ExecuteCycle()
 				emu.cycleCount++
 				time.Sleep(emu.Delay * time.Millisecond)
+
+				if emu.Debug {
+					// send CPU telemetry
+					emu.hub.Broadcast <- "TM|CPU-Execution"
+				}
 			}
 		}
 	}()
