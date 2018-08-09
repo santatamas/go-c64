@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
+	"io/ioutil"
 	"log"
-	"os"
+	//"os"
 	"time"
 )
 
@@ -26,8 +27,10 @@ func main() {
 		emulator.hub = hub
 	} else {
 		// set normal file logging
-		file, _ := os.OpenFile("log.txt", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
-		log.SetOutput(file)
+		//file, _ := os.OpenFile("log.txt", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+		log.SetOutput(ioutil.Discard)
+		//log.SetOutput(file)
+		//log.SetFlags(0)
 	}
 
 	emulator.loadFile(*programPathPtr)

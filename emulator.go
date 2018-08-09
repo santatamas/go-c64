@@ -48,7 +48,7 @@ func (emu *Emulator) Start() {
 					break
 				}
 				emu.cycleCount++
-				time.Sleep(emu.Delay * time.Millisecond)
+				//time.Sleep(emu.Delay * time.Millisecond)
 
 				if emu.Debug {
 					// send CPU telemetry
