@@ -162,9 +162,9 @@ func asciiCharacters() func(byte) rune {
 	return func(key byte) rune {
 
 		value := (byte)(key & 127)
-		if key == 129 {
+		/*if key == 129 {
 			return '∀'
-		}
+		}*/
 		//log.Println("Resolving character by bytecode: ", value)
 		//log.Println("Resolved char: ", innerMap[value])
 		return innerMap[value]

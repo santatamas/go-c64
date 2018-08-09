@@ -42,7 +42,7 @@ func (display *MemoryDisplay) DrawState(screen tcell.Screen) {
 	//st = st.Background(tcell.ColorWhite)
 	st = st.Background(getColor(backgroundColor))
 
-	frameColor := display.memory.ReadAbsolute(0xD020)
+	frameColor := display.memory.ReadAbsolute(display.frameColorAddress)
 	frameStyle := st.Background(getColor(frameColor))
 
 	for y := 0; y < display.height+2; y++ {

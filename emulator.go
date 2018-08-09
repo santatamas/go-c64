@@ -43,7 +43,10 @@ func (emu *Emulator) Start() {
 	go func() {
 		for {
 			if !emu.pauseFlag {
-				emu.CPU.ExecuteCycle()
+				result := emu.CPU.ExecuteCycle()
+				if !result {
+					break
+				}
 				emu.cycleCount++
 				time.Sleep(emu.Delay * time.Millisecond)
 
