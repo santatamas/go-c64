@@ -116,6 +116,7 @@ loop:
 		}
 
 		display.DrawState(s)
+		time.Sleep(100 * time.Millisecond)
 	}
 
 	s.Fini()

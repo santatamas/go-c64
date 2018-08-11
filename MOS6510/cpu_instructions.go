@@ -144,6 +144,10 @@ func (cpu *CPU) branch() {
 	}
 }
 
+// RTS Return from Subroutine
+// Operation:  PC fromS, PC + 1 -> PC
+//  N Z C I D V
+//  _ _ _ _ _ _
 func (cpu *CPU) RTS(mode AddressingMode) {
 	log.Println("RTS called -- adr.mode: ", mode.toString())
 	lo, _ := cpu.stackPop()
@@ -153,40 +157,22 @@ func (cpu *CPU) RTS(mode AddressingMode) {
 	cpu.PC++
 }
 
+// ADC Add memory to accumulator with carry
 // Operation:  A + M + C -> A, C
+// N Z C I D V
+// * * * _ _ *
 func (cpu *CPU) ADC(mode AddressingMode) {
 	log.Println("ADC called -- adr. mode: ", mode.toString())
 
-	hi := byte(0)
+	hi := cpu.getMemoryValue(mode)
 
-	switch mode {
-	case ZeroPage:
-		{
-			zpAdr := cpu.Memory.ReadAbsolute(cpu.PC)
-			cpu.PC++
-			hi = cpu.Memory.ReadZeroPage(zpAdr)
-		}
-	case Immidiate:
-		{
-			hi = cpu.Memory.ReadAbsolute(cpu.PC)
-			cpu.PC++
-		}
-	default:
-		log.Println("[WARNING] Unsupported addressing mode!")
+	if cpu.getStatusCarry() {
+		hi++
 	}
 
-	result := hi
-	if cpu.getStatusCarry() == true {
-		result++
-	}
+	cpu.setStatusCarry(uint16(cpu.A)+uint16(hi) > 255)
 
-	if uint16(cpu.A)+uint16(result) > 255 {
-		cpu.setStatusCarry(true)
-	} else {
-		cpu.setStatusCarry(false)
-	}
-
-	result = cpu.A + result
+	result := cpu.A + hi
 
 	isOverflow := (((cpu.A ^ hi) & 0x80) != 128) && ((cpu.A^result)&0x80) == 128
 	cpu.setStatusOverflow(isOverflow)
@@ -195,33 +181,43 @@ func (cpu *CPU) ADC(mode AddressingMode) {
 	cpu.A = result
 }
 
-// Branch on C = 1
+// BCS Branch on carry set
+// Operation:  Branch on C = 1
+// N Z C I D V
+// _ _ _ _ _ _
 func (cpu *CPU) BCS(mode AddressingMode) {
 	log.Println("BCS called -- adr.mode: ", mode.toString())
-	if cpu.getStatusCarry() == true {
+	if cpu.getStatusCarry() {
 		cpu.branch()
 	} else {
 		cpu.PC++
 	}
 }
 
+// BPL Branch on result plus
+// Operation:  Branch on N = 0
+// N Z C I D V
+// _ _ _ _ _ _
 func (cpu *CPU) BPL(mode AddressingMode) {
 	log.Println("BPL called -- adr.mode: ", mode.toString())
-	if cpu.getStatusNegative() == false {
+	if !cpu.getStatusNegative() {
 		cpu.branch()
 	} else {
 		cpu.PC++
 	}
 }
 
+// ASL Shift Left One Bit (Memory or Accumulator)
+// 					+-+-+-+-+-+-+-+-+
+// Operation:  C <- |7|6|5|4|3|2|1|0| <- 0
+//					+-+-+-+-+-+-+-+-+
+// N Z C I D V
+// * * * _ _ _
 func (cpu *CPU) ASL(mode AddressingMode) {
 	log.Println("ASL called -- adr. mode: ", mode.toString())
 	if mode == Accumulator {
 
-		carryValue := cpu.A & 0x80
-		if carryValue == 128 {
-			cpu.setStatusCarry(true)
-		}
+		cpu.setStatusCarry(cpu.A&0x80 == 128)
 
 		result := cpu.A << 1
 
@@ -229,15 +225,17 @@ func (cpu *CPU) ASL(mode AddressingMode) {
 		cpu.setStatusZero(result == 0)
 
 		cpu.A = result
-		log.Println("A register: ", cpu.A)
 		return
 	}
 
 	log.Println("[WARNING] Unsupported addressing mode!")
 }
 
+// JSR Jump to new location saving return address
 // Operation:  PC + 2 toS, (PC + 1) -> PCL
 //                         (PC + 2) -> PCH
+// N Z C I D V
+// _ _ _ _ _ _
 func (cpu *CPU) JSR(mode AddressingMode) {
 	log.Println("JSR called -- adr.mode: ", mode.toString())
 	lo := cpu.Memory.ReadAbsolute(cpu.PC)
@@ -252,6 +250,10 @@ func (cpu *CPU) JSR(mode AddressingMode) {
 	cpu.PC = n.ToInt16_2(lo, hi)
 }
 
+// BNE Branch on result not zero
+// Operation:  Branch on Z = 0
+// N Z C I D V
+// _ _ _ _ _ _
 func (cpu *CPU) BNE(mode AddressingMode) {
 	log.Println("BNE called -- adr.mode: ", mode.toString())
 	if !cpu.getStatusZero() {
@@ -261,6 +263,10 @@ func (cpu *CPU) BNE(mode AddressingMode) {
 	}
 }
 
+// BEQ Branch on result zero
+// Operation:  Branch on Z = 1
+// N Z C I D V
+// _ _ _ _ _ _
 func (cpu *CPU) BEQ(mode AddressingMode) {
 	log.Println("BEQ called -- adr.mode: ", mode.toString())
 	if cpu.getStatusZero() {
@@ -271,10 +277,18 @@ func (cpu *CPU) BEQ(mode AddressingMode) {
 	}
 }
 
+// BRK Force Break
+// Operation:  Forced Interrupt PC + 2 toS P toS
+// N Z C I D V
+// _ _ _ 1 _ _
 func (cpu *CPU) BRK(mode AddressingMode) {
 	log.Println("BRK called -- do nothing")
 }
 
+// CPX Compare Memory and Index X
+// Operation:  X - M
+// N Z C I D V
+// * * * _ _ _
 func (cpu *CPU) CPX(mode AddressingMode) {
 	log.Println("CPX called -- adr.mode: ", mode.toString())
 	if mode == Immidiate {
@@ -293,6 +307,10 @@ func (cpu *CPU) CPX(mode AddressingMode) {
 	log.Println("[WARNING] Unsupported addressing mode!")
 }
 
+// DEX Decrement index X by one
+// Operation:  X - 1 -> X
+// N Z C I D V
+// * * _ _ _ _
 func (cpu *CPU) DEX(mode AddressingMode) {
 	log.Println("DEX called -- adr.mode: ", mode.toString())
 	cpu.X--
@@ -301,6 +319,10 @@ func (cpu *CPU) DEX(mode AddressingMode) {
 	cpu.setStatusNegative(cpu.X&0x80 == 128)
 }
 
+// DEY Decrement index Y by one
+// Operation:  Y - 1 -> Y
+// N Z C I D V
+// * * _ _ _ _
 func (cpu *CPU) DEY(mode AddressingMode) {
 	log.Println("DEY called -- adr.mode: ", mode.toString())
 	cpu.Y--
@@ -309,6 +331,10 @@ func (cpu *CPU) DEY(mode AddressingMode) {
 	cpu.setStatusNegative(cpu.Y&0x80 == 128)
 }
 
+// INX Increment Index X by one
+// Operation:  X + 1 -> X
+// N Z C I D V
+// * * _ _ _ _
 func (cpu *CPU) INX(mode AddressingMode) {
 	log.Println("INX called -- adr.mode: ", mode.toString())
 	cpu.X++
@@ -316,9 +342,13 @@ func (cpu *CPU) INX(mode AddressingMode) {
 	log.Println("CPU.X: ", cpu.X)
 
 	cpu.setStatusZero(cpu.X == 0)
-	cpu.setStatusNegative(cpu.X&0x80 == 0x80)
+	cpu.setStatusNegative(cpu.X&0x80 == 128)
 }
 
+// INY Increment Index Y by one
+// Operation:  Y + 1 -> Y
+// N Z C I D V
+// * * _ _ _ _
 func (cpu *CPU) INY(mode AddressingMode) {
 	log.Println("INY called -- adr.mode: ", mode.toString())
 	cpu.Y++
@@ -328,6 +358,10 @@ func (cpu *CPU) INY(mode AddressingMode) {
 	cpu.setStatusNegative(cpu.Y&0x80 == 128)
 }
 
+// LDA Load accumulator with memory
+// Operation:  M -> A
+// N Z C I D V
+// * * _ _ _ _
 func (cpu *CPU) LDA(mode AddressingMode) {
 	log.Println("LDA called -- adr. mode: ", mode.toString())
 
@@ -340,6 +374,10 @@ func (cpu *CPU) LDA(mode AddressingMode) {
 	cpu.setStatusNegative(cpu.A&0x80 == 128)
 }
 
+// LDX Load Index X with memory
+// Operation:  M -> X
+// N Z C I D V
+// * * _ _ _ _
 func (cpu *CPU) LDX(mode AddressingMode) {
 	log.Println("LDX called -- adr. mode: ", mode.toString())
 
@@ -351,6 +389,10 @@ func (cpu *CPU) LDX(mode AddressingMode) {
 	cpu.setStatusNegative(cpu.X&0x80 == 128)
 }
 
+// LDY Load Index Y with memory
+// Operation:  M -> Y
+// N Z C I D V
+// * * _ _ _ _
 func (cpu *CPU) LDY(mode AddressingMode) {
 	log.Println("LDY called -- adr. mode: ", mode.toString())
 	hi := cpu.getMemoryValue(mode)
@@ -361,6 +403,10 @@ func (cpu *CPU) LDY(mode AddressingMode) {
 	cpu.setStatusNegative(cpu.Y&0x80 == 128)
 }
 
+// STA Store accumulator in memory
+// Operation:  A -> M
+// N Z C I D V
+// _ _ _ _ _ _
 func (cpu *CPU) STA(mode AddressingMode) {
 	log.Println("STA called -- adr. mode: ", mode.toString())
 
@@ -436,6 +482,10 @@ func (cpu *CPU) STA(mode AddressingMode) {
 	log.Println("[WARNING] Unsupported addressing mode!")
 }
 
+// STX Store Index X in memory
+// Operation:  X -> M
+// N Z C I D V
+// _ _ _ _ _ _
 func (cpu *CPU) STX(mode AddressingMode) {
 	log.Println("STX called -- adr. mode: ", mode.toString())
 
@@ -470,6 +520,10 @@ func (cpu *CPU) STX(mode AddressingMode) {
 	log.Println("[WARNING] Unsupported addressing mode!")
 }
 
+// STY Store Index Y in memory
+// Operation:  Y -> M
+// N Z C I D V
+// _ _ _ _ _ _
 func (cpu *CPU) STY(mode AddressingMode) {
 	log.Println("STY called -- adr. mode: ", mode.toString())
 
@@ -504,6 +558,10 @@ func (cpu *CPU) STY(mode AddressingMode) {
 	log.Println("[WARNING] Unsupported addressing mode!")
 }
 
+// TAX Transfer accumulator to index X
+// Operation:  A -> X
+// N Z C I D V
+// * * _ _ _ _
 func (cpu *CPU) TAX(mode AddressingMode) {
 	log.Println("TAX called -- adr. mode: ", mode.toString())
 	if mode == Implied {
@@ -519,6 +577,10 @@ func (cpu *CPU) TAX(mode AddressingMode) {
 	log.Println("[WARNING] Unsupported addressing mode!")
 }
 
+// TXA Transfer index X to accumulator
+// Operation:  X -> A
+// N Z C I D V
+// * * _ _ _ _
 func (cpu *CPU) TXA(mode AddressingMode) {
 	log.Println("TXA called -- adr. mode: ", mode.toString())
 	if mode == Implied {
@@ -533,6 +595,10 @@ func (cpu *CPU) TXA(mode AddressingMode) {
 	log.Println("[WARNING] Unsupported addressing mode!")
 }
 
+// TAY Transfer accumulator to index Y
+// Operation:  A -> Y
+// N Z C I D V
+// * * _ _ _ _
 func (cpu *CPU) TAY(mode AddressingMode) {
 	log.Println("TAY called -- adr. mode: ", mode.toString())
 	if mode == Implied {
@@ -547,6 +613,10 @@ func (cpu *CPU) TAY(mode AddressingMode) {
 	log.Println("[WARNING] Unsupported addressing mode!")
 }
 
+// TYA Transfer index Y to accumulator
+// Operation:  Y -> A
+// N Z C I D V
+// * * _ _ _ _
 func (cpu *CPU) TYA(mode AddressingMode) {
 	log.Println("TYA called -- adr. mode: ", mode.toString())
 	if mode == Implied {
@@ -561,6 +631,10 @@ func (cpu *CPU) TYA(mode AddressingMode) {
 	log.Println("[WARNING] Unsupported addressing mode!")
 }
 
+// AND "AND" memory with accumulator
+// Operation:  A /\ M -> A
+// N Z C I D V
+// * * _ _ _
 func (cpu *CPU) AND(mode AddressingMode) {
 	log.Println("AND called -- adr. mode: ", mode.toString())
 	if mode == Immidiate {
@@ -577,6 +651,10 @@ func (cpu *CPU) AND(mode AddressingMode) {
 	log.Println("[WARNING] Unsupported addressing mode!")
 }
 
+// INC Increment memory by one
+// Operation:  M + 1 -> M
+// N Z C I D V
+// * * _ _ _ _
 func (cpu *CPU) INC(mode AddressingMode) {
 	log.Println("INC called -- adr. mode: ", mode.toString())
 	mem := byte(0)
@@ -599,8 +677,14 @@ func (cpu *CPU) INC(mode AddressingMode) {
 	cpu.setStatusNegative(mem+1&0x80 == 128)
 }
 
+// JMP Jump to new location
+// Operation:  (PC + 1) -> PCL
+//             (PC + 2) -> PCH
+// N Z C I D V
+// _ _ _ _ _ _
 func (cpu *CPU) JMP(mode AddressingMode) {
 	log.Println("JMP called -- adr. mode: ", mode.toString())
+
 	if mode == Absolute {
 		log.Println("Absolute mode")
 		hi := cpu.Memory.ReadAbsolute(cpu.PC)
@@ -634,6 +718,10 @@ func (cpu *CPU) JMP(mode AddressingMode) {
 	log.Println("[WARNING] Unsupported addressing mode!")
 }
 
+// CMP Compare memory and accumulator
+// Operation:  A - M
+// N Z C I D V
+// * * * _ _ _
 func (cpu *CPU) CMP(mode AddressingMode) {
 	log.Println("CMP called -- adr. mode: ", mode.toString())
 
@@ -649,12 +737,20 @@ func (cpu *CPU) CMP(mode AddressingMode) {
 	cpu.setStatusCarry(cpu.A >= mem)
 }
 
+// SEC Set carry flag
+// Operation:  1 -> C
+// N Z C I D V
+// _ _ 1 _ _ _
 func (cpu *CPU) SEC(mode AddressingMode) {
 	log.Println("SEC called -- adr. mode: ", mode.toString())
 	cpu.setStatusCarry(true)
 }
 
+// SBC Subtract memory from accumulator with borrow
 // Operation:  A - M - C -> A
+// N Z C I D V
+// * * * _ _ *
+// Note:C = Borrow
 func (cpu *CPU) SBC(mode AddressingMode) {
 	log.Println("SBC called -- adr. mode: ", mode.toString())
 	if mode == Immidiate {
@@ -679,11 +775,14 @@ func (cpu *CPU) SBC(mode AddressingMode) {
 	log.Println("[WARNING] Unsupported addressing mode!")
 }
 
+// ROR Rotate one bit right (memory or accumulator)
 //               +------------------------------+
 //               |                              |
 //               |   +-+    +-+-+-+-+-+-+-+-+   |
 //  Operation:   +-> |C| -> |7|6|5|4|3|2|1|0| >-+
 //                   +-+    +-+-+-+-+-+-+-+-+
+// N Z C I D V
+// * * * _ _ _
 func (cpu *CPU) ROR(mode AddressingMode) {
 	log.Println("ROR called -- adr. mode: ", mode.toString())
 
@@ -699,6 +798,10 @@ func (cpu *CPU) ROR(mode AddressingMode) {
 	cpu.setStatusZero(cpu.A == 0)
 }
 
+// EOR "Exclusive-Or" memory with accumulator
+// Operation:  A EOR M -> A
+// N Z C I D V
+// * * _ _ _ _
 func (cpu *CPU) EOR(mode AddressingMode) {
 	log.Println("EOR called -- adr. mode: ", mode.toString())
 	if mode == Immidiate {
@@ -715,10 +818,18 @@ func (cpu *CPU) EOR(mode AddressingMode) {
 	log.Println("[WARNING] Unsupported addressing mode!")
 }
 
+// NOP No operation
+// Operation:  No Operation (2 cycles)
+// N Z C I D V
+// _ _ _ _ _ _
 func (cpu *CPU) NOP(mode AddressingMode) {
 	log.Println("NOP called -- adr. mode: ", mode.toString())
 }
 
+// CPY Compare memory and index Y
+// Operation:  Y - M
+// N Z C I D V
+// * * * _ _ _
 func (cpu *CPU) CPY(mode AddressingMode) {
 	log.Println("CPY called -- adr. mode: ", mode.toString())
 	if mode == Immidiate {
@@ -737,6 +848,10 @@ func (cpu *CPU) CPY(mode AddressingMode) {
 	log.Println("[WARNING] Unsupported addressing mode!")
 }
 
+// BCC Branch on Carry Clear
+// Operation:  Branch on C = 0
+// N Z C I D V
+// _ _ _ _ _ _
 func (cpu *CPU) BCC(mode AddressingMode) {
 	log.Println("BCC called -- adr. mode: ", mode.toString())
 	if !cpu.getStatusCarry() {
@@ -746,6 +861,10 @@ func (cpu *CPU) BCC(mode AddressingMode) {
 	}
 }
 
+// BMI Branch on result minus
+// Operation:  Branch on N = 1
+// N Z C I D V
+// _ _ _ _ _ _
 func (cpu *CPU) BMI(mode AddressingMode) {
 	log.Println("BMI called -- adr. mode: ", mode.toString())
 	if cpu.getStatusNegative() {
@@ -755,6 +874,10 @@ func (cpu *CPU) BMI(mode AddressingMode) {
 	}
 }
 
+// CLC Clear carry flag
+// Operation:  0 -> C
+// N Z C I D V
+// _ _ 0 _ _ _
 func (cpu *CPU) CLC(mode AddressingMode) {
 	log.Println("CLC called -- adr. mode: ", mode.toString())
 	cpu.setStatusCarry(false)

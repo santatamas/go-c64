@@ -61,7 +61,11 @@ func TestCPU_ADC_zeropage_initialCarry(t *testing.T) {
 	}
 
 	if cpu.PC != 1001 {
-		t.Errorf("Wrong PC value after ADC operation, got: %d, want: %d.", cpu.PC, 1)
+		t.Errorf("Wrong PC value after ADC operation, got: %d, want: %d.", cpu.PC, 1001)
+	}
+
+	if cpu.getStatusZero() {
+		t.Errorf("Wrong Zero status flag value after ADC operation, got: %t, want: %t.", cpu.getStatusZero(), false)
 	}
 }
 
@@ -224,4 +228,124 @@ func TestCPU_ASL_negative(t *testing.T) {
 	if cpu.PC != 0 {
 		t.Errorf("Wrong PC value after ASL operation, got: %d, want: %d.", cpu.PC, 0)
 	}
+}
+
+func TestCPU_JSR(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_BNE(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_BEQ(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_CPX(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_DEX(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_DEY(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_INX(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_INY(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_LDA(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_LDX(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_LDY(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_STA(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_STX(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_STY(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_TAX(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_TXA(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_TAY(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_TYA(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_AND(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_INC(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_JMP(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_CMP(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_SEC(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_SBC(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_ROR(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_EOR(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_CPY(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_BCC(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_BMI(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_CLC(t *testing.T) {
+	// TODO
 }
