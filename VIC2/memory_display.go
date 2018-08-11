@@ -38,9 +38,9 @@ func (display *MemoryDisplay) ReadCurrentState() [40][25]rune {
 
 func (display *MemoryDisplay) DrawState(screen tcell.Screen) {
 	st := tcell.StyleDefault
-	backgroundColor := display.memory.ReadAbsolute(display.backgroundColorAddress)
-	//st = st.Background(tcell.ColorWhite)
-	st = st.Background(getColor(backgroundColor))
+	//backgroundColor := display.memory.ReadAbsolute(display.backgroundColorAddress)
+	st = st.Background(tcell.ColorWhite)
+	//st = st.Background(getColor(backgroundColor))
 
 	frameColor := display.memory.ReadAbsolute(display.frameColorAddress)
 	frameStyle := st.Background(getColor(frameColor))

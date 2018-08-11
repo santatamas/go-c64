@@ -50,3 +50,98 @@ func (cpu *CPU) ExecuteCycle() bool {
 	cpu.callMethod(instruction)
 	return instruction.Type != BRK
 }
+
+func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
+	switch instruction.Type {
+	case BNE:
+		cpu.BNE(instruction.AddressingMode)
+	case BRK:
+		cpu.BRK(instruction.AddressingMode)
+	case CPX:
+		cpu.CPX(instruction.AddressingMode)
+	case INX:
+		cpu.INX(instruction.AddressingMode)
+	case INY:
+		cpu.INY(instruction.AddressingMode)
+	case LDA:
+		cpu.LDA(instruction.AddressingMode)
+	case LDX:
+		cpu.LDX(instruction.AddressingMode)
+	case LDY:
+		cpu.LDY(instruction.AddressingMode)
+	case STA:
+		cpu.STA(instruction.AddressingMode)
+	case STX:
+		cpu.STX(instruction.AddressingMode)
+	case STY:
+		cpu.STY(instruction.AddressingMode)
+	case TAY:
+		cpu.TAY(instruction.AddressingMode)
+	case TAX:
+		cpu.TAX(instruction.AddressingMode)
+	case TXA:
+		cpu.TXA(instruction.AddressingMode)
+	case TYA:
+		cpu.TYA(instruction.AddressingMode)
+	case JSR:
+		cpu.JSR(instruction.AddressingMode)
+	case ASL:
+		cpu.ASL(instruction.AddressingMode)
+	case BCS:
+		cpu.BCS(instruction.AddressingMode)
+	case ADC:
+		cpu.ADC(instruction.AddressingMode)
+	case RTS:
+		cpu.RTS(instruction.AddressingMode)
+	case DEX:
+		cpu.DEX(instruction.AddressingMode)
+	case DEY:
+		cpu.DEY(instruction.AddressingMode)
+	case BPL:
+		cpu.BPL(instruction.AddressingMode)
+	case AND:
+		cpu.AND(instruction.AddressingMode)
+	case INC:
+		cpu.INC(instruction.AddressingMode)
+	case JMP:
+		cpu.JMP(instruction.AddressingMode)
+	case CMP:
+		cpu.CMP(instruction.AddressingMode)
+	case BEQ:
+		cpu.BEQ(instruction.AddressingMode)
+	case SEC:
+		cpu.SEC(instruction.AddressingMode)
+	case SBC:
+		cpu.SBC(instruction.AddressingMode)
+	case ROR:
+		cpu.ROR(instruction.AddressingMode)
+	case EOR:
+		cpu.EOR(instruction.AddressingMode)
+	case NOP:
+		cpu.NOP(instruction.AddressingMode)
+	case CPY:
+		cpu.CPY(instruction.AddressingMode)
+	case BCC:
+		cpu.BCC(instruction.AddressingMode)
+	case CLC:
+		cpu.CLC(instruction.AddressingMode)
+	case BMI:
+		cpu.BMI(instruction.AddressingMode)
+	case PHA:
+		cpu.PHA(instruction.AddressingMode)
+	case PHP:
+		cpu.PHP(instruction.AddressingMode)
+	case PLA:
+		cpu.PLA(instruction.AddressingMode)
+	case TSX:
+		cpu.TSX(instruction.AddressingMode)
+	case TXS:
+		cpu.TXS(instruction.AddressingMode)
+	case BIT:
+		cpu.BIT(instruction.AddressingMode)
+	case BVC:
+		cpu.BVC(instruction.AddressingMode)
+	default:
+		log.Println("[WARNING] Unimplemented instruction! ", instruction.Type)
+	}
+}

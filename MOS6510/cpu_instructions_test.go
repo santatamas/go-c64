@@ -349,3 +349,15 @@ func TestCPU_BMI(t *testing.T) {
 func TestCPU_CLC(t *testing.T) {
 	// TODO
 }
+
+func TestCPU_PHA(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_PLA(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_TSX(t *testing.T) {
+	// TODO
+}

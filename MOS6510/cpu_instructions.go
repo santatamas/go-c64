@@ -5,87 +5,6 @@ import (
 	"log"
 )
 
-func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
-	switch instruction.Type {
-	case BNE:
-		cpu.BNE(instruction.AddressingMode)
-	case BRK:
-		cpu.BRK(instruction.AddressingMode)
-	case CPX:
-		cpu.CPX(instruction.AddressingMode)
-	case INX:
-		cpu.INX(instruction.AddressingMode)
-	case INY:
-		cpu.INY(instruction.AddressingMode)
-	case LDA:
-		cpu.LDA(instruction.AddressingMode)
-	case LDX:
-		cpu.LDX(instruction.AddressingMode)
-	case LDY:
-		cpu.LDY(instruction.AddressingMode)
-	case STA:
-		cpu.STA(instruction.AddressingMode)
-	case STX:
-		cpu.STX(instruction.AddressingMode)
-	case STY:
-		cpu.STY(instruction.AddressingMode)
-	case TAY:
-		cpu.TAY(instruction.AddressingMode)
-	case TAX:
-		cpu.TAX(instruction.AddressingMode)
-	case TXA:
-		cpu.TXA(instruction.AddressingMode)
-	case TYA:
-		cpu.TYA(instruction.AddressingMode)
-	case JSR:
-		cpu.JSR(instruction.AddressingMode)
-	case ASL:
-		cpu.ASL(instruction.AddressingMode)
-	case BCS:
-		cpu.BCS(instruction.AddressingMode)
-	case ADC:
-		cpu.ADC(instruction.AddressingMode)
-	case RTS:
-		cpu.RTS(instruction.AddressingMode)
-	case DEX:
-		cpu.DEX(instruction.AddressingMode)
-	case DEY:
-		cpu.DEY(instruction.AddressingMode)
-	case BPL:
-		cpu.BPL(instruction.AddressingMode)
-	case AND:
-		cpu.AND(instruction.AddressingMode)
-	case INC:
-		cpu.INC(instruction.AddressingMode)
-	case JMP:
-		cpu.JMP(instruction.AddressingMode)
-	case CMP:
-		cpu.CMP(instruction.AddressingMode)
-	case BEQ:
-		cpu.BEQ(instruction.AddressingMode)
-	case SEC:
-		cpu.SEC(instruction.AddressingMode)
-	case SBC:
-		cpu.SBC(instruction.AddressingMode)
-	case ROR:
-		cpu.ROR(instruction.AddressingMode)
-	case EOR:
-		cpu.EOR(instruction.AddressingMode)
-	case NOP:
-		cpu.NOP(instruction.AddressingMode)
-	case CPY:
-		cpu.CPY(instruction.AddressingMode)
-	case BCC:
-		cpu.BCC(instruction.AddressingMode)
-	case CLC:
-		cpu.CLC(instruction.AddressingMode)
-	case BMI:
-		cpu.BMI(instruction.AddressingMode)
-	default:
-		log.Println("[WARNING] Unimplemented instruction! ", instruction.Type)
-	}
-}
-
 func (cpu *CPU) getMemoryValue(mode AddressingMode) byte {
 	hi := byte(0)
 
@@ -881,4 +800,81 @@ func (cpu *CPU) BMI(mode AddressingMode) {
 func (cpu *CPU) CLC(mode AddressingMode) {
 	log.Println("CLC called -- adr. mode: ", mode.toString())
 	cpu.setStatusCarry(false)
+}
+
+// PHA Push accumulator on stack
+// Operation:  A toS
+// N Z C I D V
+// _ _ _ _ _ _
+func (cpu *CPU) PHA(mode AddressingMode) {
+	log.Println("PHA called -- adr. mode: ", mode.toString())
+	cpu.stackPush(cpu.A)
+}
+
+// PLA Pull accumulator from stack
+// Operation:  A fromS
+// N Z C I D V
+// _ _ _ _ _ _
+func (cpu *CPU) PLA(mode AddressingMode) {
+	log.Println("PLA called -- adr. mode: ", mode.toString())
+	cpu.A, _ = cpu.stackPop()
+}
+
+// PHP Push processor status on stack
+// Operation:  P toS
+// N Z C I D V
+// _ _ _ _ _ _
+func (cpu *CPU) PHP(mode AddressingMode) {
+	log.Println("PHP called -- adr. mode: ", mode.toString())
+	cpu.stackPush(cpu.P)
+}
+
+// TSX Transfer stack pointer to index X
+// Operation:  S -> X
+// N Z C I D V
+// * * _ _ _ _
+func (cpu *CPU) TSX(mode AddressingMode) {
+	log.Println("TSX called -- adr. mode: ", mode.toString())
+	cpu.X = cpu.SP
+
+	cpu.setStatusZero(cpu.X == 0)
+	cpu.setStatusNegative(cpu.X&0x80 == 128)
+}
+
+// TXS Transfer index X to stack pointer
+// Operation:  X -> S
+// N Z C I D V
+// _ _ _ _ _ _
+func (cpu *CPU) TXS(mode AddressingMode) {
+	log.Println("TXS called -- adr. mode: ", mode.toString())
+	cpu.SP = cpu.X
+}
+
+// BIT Test bits in memory with accumulator
+// Operation:  A /\ M, M7 -> N, M6 -> V
+// Bit 6 and 7 are transferred to the status register.
+// If the result of A /\ M is zero then Z = 1, otherwise Z = 0
+// N  Z C I D V
+// M7 * _ _ _ M6
+func (cpu *CPU) BIT(mode AddressingMode) {
+	log.Println("BIT called -- adr. mode: ", mode.toString())
+	mem := cpu.getMemoryValue(mode)
+
+	cpu.setStatusNegative(mem&0x80 == 128)
+	cpu.setStatusOverflow(mem&64 == 64)
+	cpu.setStatusZero(mem&cpu.A == 0)
+}
+
+// BVC Branch on overflow clear
+// Operation:  Branch on V = 0
+// N Z C I D V
+// _ _ _ _ _ _
+func (cpu *CPU) BVC(mode AddressingMode) {
+	log.Println("BVC called -- adr.mode: ", mode.toString())
+	if !cpu.getStatusOverflow() {
+		cpu.branch()
+
+	} else {
+		cpu.PC++
+	}
 }
