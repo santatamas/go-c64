@@ -141,6 +141,10 @@ func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
 		cpu.BIT(instruction.AddressingMode)
 	case BVC:
 		cpu.BVC(instruction.AddressingMode)
+	case BVS:
+		cpu.BVS(instruction.AddressingMode)
+	case PLP:
+		cpu.PLP(instruction.AddressingMode)
 	default:
 		log.Println("[WARNING] Unimplemented instruction! ", instruction.Type)
 	}

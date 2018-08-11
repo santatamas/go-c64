@@ -826,7 +826,16 @@ func (cpu *CPU) PLA(mode AddressingMode) {
 // _ _ _ _ _ _
 func (cpu *CPU) PHP(mode AddressingMode) {
 	log.Println("PHP called -- adr. mode: ", mode.toString())
-	cpu.stackPush(cpu.P)
+	cpu.stackPush(cpu.S)
+}
+
+// PLP Pull processor status from stack
+// Operation:  P fromS
+// From Stack
+// _ _ _ _ _ _
+func (cpu *CPU) PLP(mode AddressingMode) {
+	log.Println("PLP called -- adr. mode: ", mode.toString())
+	cpu.S, _ = cpu.stackPop()
 }
 
 // TSX Transfer stack pointer to index X
@@ -872,6 +881,20 @@ func (cpu *CPU) BIT(mode AddressingMode) {
 func (cpu *CPU) BVC(mode AddressingMode) {
 	log.Println("BVC called -- adr.mode: ", mode.toString())
 	if !cpu.getStatusOverflow() {
+		cpu.branch()
+
+	} else {
+		cpu.PC++
+	}
+}
+
+// BVS Branch on overflow set
+// Operation:  Branch on V = 1
+// N Z C I D V
+// _ _ _ _ _ _
+func (cpu *CPU) BVS(mode AddressingMode) {
+	log.Println("BVS called -- adr.mode: ", mode.toString())
+	if cpu.getStatusOverflow() {
 		cpu.branch()
 
 	} else {

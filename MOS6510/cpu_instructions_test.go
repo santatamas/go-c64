@@ -361,3 +361,11 @@ func TestCPU_PLA(t *testing.T) {
 func TestCPU_TSX(t *testing.T) {
 	// TODO
 }
+
+func TestCPU_PLP(t *testing.T) {
+	// TODO
+}
+
+func TestCPU_BVS(t *testing.T) {
+	// TODO
+}
