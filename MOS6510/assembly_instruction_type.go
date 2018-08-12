@@ -1,3 +1,4 @@
+//go:generate stringer -type=AssemblyInstructionType -linecomment=false
 package MOS6510
 
 type AssemblyInstructionType int

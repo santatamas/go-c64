@@ -3,6 +3,7 @@ package MOS6510
 import (
 	"github.com/santatamas/go-c64/RAM"
 	"log"
+	"reflect"
 )
 
 type CPU struct {
@@ -51,6 +52,14 @@ func (cpu *CPU) ExecuteCycle() bool {
 	return instruction.Type != BRK
 }
 
+// slow
+func (cpu *CPU) callMethodReflection(instruction AssemblyInstruction) {
+	inputs := make([]reflect.Value, 1)
+	inputs[0] = reflect.ValueOf(instruction.AddressingMode)
+	reflect.ValueOf(cpu).MethodByName(instruction.Type.String()).Call(inputs)
+}
+
+// fast
 func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
 	switch instruction.Type {
 	case BNE:
@@ -146,6 +155,6 @@ func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
 	case PLP:
 		cpu.PLP(instruction.AddressingMode)
 	default:
-		log.Println("[WARNING] Unimplemented instruction! ", instruction.Type)
+		log.Println("[WARNING] Unimplemented instruction! ", instruction.Type.String())
 	}
 }

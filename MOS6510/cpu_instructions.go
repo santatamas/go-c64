@@ -68,7 +68,7 @@ func (cpu *CPU) branch() {
 //  N Z C I D V
 //  _ _ _ _ _ _
 func (cpu *CPU) RTS(mode AddressingMode) {
-	log.Println("RTS called -- adr.mode: ", mode.toString())
+	log.Println("RTS called -- adr.mode: ", mode.String())
 	lo, _ := cpu.stackPop()
 	hi, _ := cpu.stackPop()
 
@@ -81,7 +81,7 @@ func (cpu *CPU) RTS(mode AddressingMode) {
 // N Z C I D V
 // * * * _ _ *
 func (cpu *CPU) ADC(mode AddressingMode) {
-	log.Println("ADC called -- adr. mode: ", mode.toString())
+	log.Println("ADC called -- adr. mode: ", mode.String())
 
 	hi := cpu.getMemoryValue(mode)
 
@@ -105,7 +105,7 @@ func (cpu *CPU) ADC(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) BCS(mode AddressingMode) {
-	log.Println("BCS called -- adr.mode: ", mode.toString())
+	log.Println("BCS called -- adr.mode: ", mode.String())
 	if cpu.getStatusCarry() {
 		cpu.branch()
 	} else {
@@ -118,7 +118,7 @@ func (cpu *CPU) BCS(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) BPL(mode AddressingMode) {
-	log.Println("BPL called -- adr.mode: ", mode.toString())
+	log.Println("BPL called -- adr.mode: ", mode.String())
 	if !cpu.getStatusNegative() {
 		cpu.branch()
 	} else {
@@ -133,7 +133,7 @@ func (cpu *CPU) BPL(mode AddressingMode) {
 // N Z C I D V
 // * * * _ _ _
 func (cpu *CPU) ASL(mode AddressingMode) {
-	log.Println("ASL called -- adr. mode: ", mode.toString())
+	log.Println("ASL called -- adr. mode: ", mode.String())
 	if mode == Accumulator {
 
 		cpu.setStatusCarry(cpu.A&0x80 == 128)
@@ -156,7 +156,7 @@ func (cpu *CPU) ASL(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) JSR(mode AddressingMode) {
-	log.Println("JSR called -- adr.mode: ", mode.toString())
+	log.Println("JSR called -- adr.mode: ", mode.String())
 	lo := cpu.Memory.ReadAbsolute(cpu.PC)
 	cpu.PC++
 
@@ -174,7 +174,7 @@ func (cpu *CPU) JSR(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) BNE(mode AddressingMode) {
-	log.Println("BNE called -- adr.mode: ", mode.toString())
+	log.Println("BNE called -- adr.mode: ", mode.String())
 	if !cpu.getStatusZero() {
 		cpu.branch()
 	} else {
@@ -187,7 +187,7 @@ func (cpu *CPU) BNE(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) BEQ(mode AddressingMode) {
-	log.Println("BEQ called -- adr.mode: ", mode.toString())
+	log.Println("BEQ called -- adr.mode: ", mode.String())
 	if cpu.getStatusZero() {
 		cpu.branch()
 
@@ -209,7 +209,7 @@ func (cpu *CPU) BRK(mode AddressingMode) {
 // N Z C I D V
 // * * * _ _ _
 func (cpu *CPU) CPX(mode AddressingMode) {
-	log.Println("CPX called -- adr.mode: ", mode.toString())
+	log.Println("CPX called -- adr.mode: ", mode.String())
 	if mode == Immidiate {
 		aa := cpu.Memory.ReadAbsolute(cpu.PC)
 		log.Println("Value to compare with X: ", aa)
@@ -231,7 +231,7 @@ func (cpu *CPU) CPX(mode AddressingMode) {
 // N Z C I D V
 // * * _ _ _ _
 func (cpu *CPU) DEX(mode AddressingMode) {
-	log.Println("DEX called -- adr.mode: ", mode.toString())
+	log.Println("DEX called -- adr.mode: ", mode.String())
 	cpu.X--
 
 	cpu.setStatusZero(cpu.X == 0)
@@ -243,7 +243,7 @@ func (cpu *CPU) DEX(mode AddressingMode) {
 // N Z C I D V
 // * * _ _ _ _
 func (cpu *CPU) DEY(mode AddressingMode) {
-	log.Println("DEY called -- adr.mode: ", mode.toString())
+	log.Println("DEY called -- adr.mode: ", mode.String())
 	cpu.Y--
 
 	cpu.setStatusZero(cpu.Y == 0)
@@ -255,7 +255,7 @@ func (cpu *CPU) DEY(mode AddressingMode) {
 // N Z C I D V
 // * * _ _ _ _
 func (cpu *CPU) INX(mode AddressingMode) {
-	log.Println("INX called -- adr.mode: ", mode.toString())
+	log.Println("INX called -- adr.mode: ", mode.String())
 	cpu.X++
 
 	log.Println("CPU.X: ", cpu.X)
@@ -269,7 +269,7 @@ func (cpu *CPU) INX(mode AddressingMode) {
 // N Z C I D V
 // * * _ _ _ _
 func (cpu *CPU) INY(mode AddressingMode) {
-	log.Println("INY called -- adr.mode: ", mode.toString())
+	log.Println("INY called -- adr.mode: ", mode.String())
 	cpu.Y++
 
 	log.Println("CPU.Y: ", cpu.Y)
@@ -282,7 +282,7 @@ func (cpu *CPU) INY(mode AddressingMode) {
 // N Z C I D V
 // * * _ _ _ _
 func (cpu *CPU) LDA(mode AddressingMode) {
-	log.Println("LDA called -- adr. mode: ", mode.toString())
+	log.Println("LDA called -- adr. mode: ", mode.String())
 
 	hi := cpu.getMemoryValue(mode)
 
@@ -298,7 +298,7 @@ func (cpu *CPU) LDA(mode AddressingMode) {
 // N Z C I D V
 // * * _ _ _ _
 func (cpu *CPU) LDX(mode AddressingMode) {
-	log.Println("LDX called -- adr. mode: ", mode.toString())
+	log.Println("LDX called -- adr. mode: ", mode.String())
 
 	hi := cpu.getMemoryValue(mode)
 
@@ -313,7 +313,7 @@ func (cpu *CPU) LDX(mode AddressingMode) {
 // N Z C I D V
 // * * _ _ _ _
 func (cpu *CPU) LDY(mode AddressingMode) {
-	log.Println("LDY called -- adr. mode: ", mode.toString())
+	log.Println("LDY called -- adr. mode: ", mode.String())
 	hi := cpu.getMemoryValue(mode)
 
 	cpu.Y = hi
@@ -327,7 +327,7 @@ func (cpu *CPU) LDY(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) STA(mode AddressingMode) {
-	log.Println("STA called -- adr. mode: ", mode.toString())
+	log.Println("STA called -- adr. mode: ", mode.String())
 
 	hi := cpu.Memory.ReadAbsolute(cpu.PC)
 	cpu.PC++
@@ -406,7 +406,7 @@ func (cpu *CPU) STA(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) STX(mode AddressingMode) {
-	log.Println("STX called -- adr. mode: ", mode.toString())
+	log.Println("STX called -- adr. mode: ", mode.String())
 
 	hi := cpu.Memory.ReadAbsolute(cpu.PC)
 	cpu.PC++
@@ -444,7 +444,7 @@ func (cpu *CPU) STX(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) STY(mode AddressingMode) {
-	log.Println("STY called -- adr. mode: ", mode.toString())
+	log.Println("STY called -- adr. mode: ", mode.String())
 
 	hi := cpu.Memory.ReadAbsolute(cpu.PC)
 	cpu.PC++
@@ -482,7 +482,7 @@ func (cpu *CPU) STY(mode AddressingMode) {
 // N Z C I D V
 // * * _ _ _ _
 func (cpu *CPU) TAX(mode AddressingMode) {
-	log.Println("TAX called -- adr. mode: ", mode.toString())
+	log.Println("TAX called -- adr. mode: ", mode.String())
 	if mode == Implied {
 		log.Println("Setting CPU register X to value: ", cpu.A)
 
@@ -501,7 +501,7 @@ func (cpu *CPU) TAX(mode AddressingMode) {
 // N Z C I D V
 // * * _ _ _ _
 func (cpu *CPU) TXA(mode AddressingMode) {
-	log.Println("TXA called -- adr. mode: ", mode.toString())
+	log.Println("TXA called -- adr. mode: ", mode.String())
 	if mode == Implied {
 		log.Println("Setting CPU register A to value: ", cpu.X)
 
@@ -519,7 +519,7 @@ func (cpu *CPU) TXA(mode AddressingMode) {
 // N Z C I D V
 // * * _ _ _ _
 func (cpu *CPU) TAY(mode AddressingMode) {
-	log.Println("TAY called -- adr. mode: ", mode.toString())
+	log.Println("TAY called -- adr. mode: ", mode.String())
 	if mode == Implied {
 		log.Println("Setting CPU register Y to value: ", cpu.A)
 
@@ -537,7 +537,7 @@ func (cpu *CPU) TAY(mode AddressingMode) {
 // N Z C I D V
 // * * _ _ _ _
 func (cpu *CPU) TYA(mode AddressingMode) {
-	log.Println("TYA called -- adr. mode: ", mode.toString())
+	log.Println("TYA called -- adr. mode: ", mode.String())
 	if mode == Implied {
 		log.Println("Setting CPU register A to value: ", cpu.Y)
 
@@ -555,7 +555,7 @@ func (cpu *CPU) TYA(mode AddressingMode) {
 // N Z C I D V
 // * * _ _ _
 func (cpu *CPU) AND(mode AddressingMode) {
-	log.Println("AND called -- adr. mode: ", mode.toString())
+	log.Println("AND called -- adr. mode: ", mode.String())
 	if mode == Immidiate {
 		mem := cpu.Memory.ReadAbsolute(cpu.PC)
 		cpu.PC++
@@ -575,7 +575,7 @@ func (cpu *CPU) AND(mode AddressingMode) {
 // N Z C I D V
 // * * _ _ _ _
 func (cpu *CPU) INC(mode AddressingMode) {
-	log.Println("INC called -- adr. mode: ", mode.toString())
+	log.Println("INC called -- adr. mode: ", mode.String())
 	mem := byte(0)
 	hi := cpu.Memory.ReadAbsolute(cpu.PC)
 	cpu.PC++
@@ -602,7 +602,7 @@ func (cpu *CPU) INC(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) JMP(mode AddressingMode) {
-	log.Println("JMP called -- adr. mode: ", mode.toString())
+	log.Println("JMP called -- adr. mode: ", mode.String())
 
 	if mode == Absolute {
 		log.Println("Absolute mode")
@@ -642,7 +642,7 @@ func (cpu *CPU) JMP(mode AddressingMode) {
 // N Z C I D V
 // * * * _ _ _
 func (cpu *CPU) CMP(mode AddressingMode) {
-	log.Println("CMP called -- adr. mode: ", mode.toString())
+	log.Println("CMP called -- adr. mode: ", mode.String())
 
 	mem := cpu.getMemoryValue(mode)
 
@@ -661,7 +661,7 @@ func (cpu *CPU) CMP(mode AddressingMode) {
 // N Z C I D V
 // _ _ 1 _ _ _
 func (cpu *CPU) SEC(mode AddressingMode) {
-	log.Println("SEC called -- adr. mode: ", mode.toString())
+	log.Println("SEC called -- adr. mode: ", mode.String())
 	cpu.setStatusCarry(true)
 }
 
@@ -671,7 +671,7 @@ func (cpu *CPU) SEC(mode AddressingMode) {
 // * * * _ _ *
 // Note:C = Borrow
 func (cpu *CPU) SBC(mode AddressingMode) {
-	log.Println("SBC called -- adr. mode: ", mode.toString())
+	log.Println("SBC called -- adr. mode: ", mode.String())
 	if mode == Immidiate {
 		mem := cpu.Memory.ReadAbsolute(cpu.PC)
 		cpu.PC++
@@ -703,7 +703,7 @@ func (cpu *CPU) SBC(mode AddressingMode) {
 // N Z C I D V
 // * * * _ _ _
 func (cpu *CPU) ROR(mode AddressingMode) {
-	log.Println("ROR called -- adr. mode: ", mode.toString())
+	log.Println("ROR called -- adr. mode: ", mode.String())
 
 	previousC := byte(0)
 	if cpu.getStatusCarry() {
@@ -722,7 +722,7 @@ func (cpu *CPU) ROR(mode AddressingMode) {
 // N Z C I D V
 // * * _ _ _ _
 func (cpu *CPU) EOR(mode AddressingMode) {
-	log.Println("EOR called -- adr. mode: ", mode.toString())
+	log.Println("EOR called -- adr. mode: ", mode.String())
 	if mode == Immidiate {
 		mem := cpu.Memory.ReadAbsolute(cpu.PC)
 		cpu.PC++
@@ -742,7 +742,7 @@ func (cpu *CPU) EOR(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) NOP(mode AddressingMode) {
-	log.Println("NOP called -- adr. mode: ", mode.toString())
+	log.Println("NOP called -- adr. mode: ", mode.String())
 }
 
 // CPY Compare memory and index Y
@@ -750,7 +750,7 @@ func (cpu *CPU) NOP(mode AddressingMode) {
 // N Z C I D V
 // * * * _ _ _
 func (cpu *CPU) CPY(mode AddressingMode) {
-	log.Println("CPY called -- adr. mode: ", mode.toString())
+	log.Println("CPY called -- adr. mode: ", mode.String())
 	if mode == Immidiate {
 		aa := cpu.Memory.ReadAbsolute(cpu.PC)
 		log.Println("Value to compare with Y: ", aa)
@@ -772,7 +772,7 @@ func (cpu *CPU) CPY(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) BCC(mode AddressingMode) {
-	log.Println("BCC called -- adr. mode: ", mode.toString())
+	log.Println("BCC called -- adr. mode: ", mode.String())
 	if !cpu.getStatusCarry() {
 		cpu.branch()
 	} else {
@@ -785,7 +785,7 @@ func (cpu *CPU) BCC(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) BMI(mode AddressingMode) {
-	log.Println("BMI called -- adr. mode: ", mode.toString())
+	log.Println("BMI called -- adr. mode: ", mode.String())
 	if cpu.getStatusNegative() {
 		cpu.branch()
 	} else {
@@ -798,7 +798,7 @@ func (cpu *CPU) BMI(mode AddressingMode) {
 // N Z C I D V
 // _ _ 0 _ _ _
 func (cpu *CPU) CLC(mode AddressingMode) {
-	log.Println("CLC called -- adr. mode: ", mode.toString())
+	log.Println("CLC called -- adr. mode: ", mode.String())
 	cpu.setStatusCarry(false)
 }
 
@@ -807,7 +807,7 @@ func (cpu *CPU) CLC(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) PHA(mode AddressingMode) {
-	log.Println("PHA called -- adr. mode: ", mode.toString())
+	log.Println("PHA called -- adr. mode: ", mode.String())
 	cpu.stackPush(cpu.A)
 }
 
@@ -816,7 +816,7 @@ func (cpu *CPU) PHA(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) PLA(mode AddressingMode) {
-	log.Println("PLA called -- adr. mode: ", mode.toString())
+	log.Println("PLA called -- adr. mode: ", mode.String())
 	cpu.A, _ = cpu.stackPop()
 }
 
@@ -825,7 +825,7 @@ func (cpu *CPU) PLA(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) PHP(mode AddressingMode) {
-	log.Println("PHP called -- adr. mode: ", mode.toString())
+	log.Println("PHP called -- adr. mode: ", mode.String())
 	cpu.stackPush(cpu.S)
 }
 
@@ -834,7 +834,7 @@ func (cpu *CPU) PHP(mode AddressingMode) {
 // From Stack
 // _ _ _ _ _ _
 func (cpu *CPU) PLP(mode AddressingMode) {
-	log.Println("PLP called -- adr. mode: ", mode.toString())
+	log.Println("PLP called -- adr. mode: ", mode.String())
 	cpu.S, _ = cpu.stackPop()
 }
 
@@ -843,7 +843,7 @@ func (cpu *CPU) PLP(mode AddressingMode) {
 // N Z C I D V
 // * * _ _ _ _
 func (cpu *CPU) TSX(mode AddressingMode) {
-	log.Println("TSX called -- adr. mode: ", mode.toString())
+	log.Println("TSX called -- adr. mode: ", mode.String())
 	cpu.X = cpu.SP
 
 	cpu.setStatusZero(cpu.X == 0)
@@ -855,7 +855,7 @@ func (cpu *CPU) TSX(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) TXS(mode AddressingMode) {
-	log.Println("TXS called -- adr. mode: ", mode.toString())
+	log.Println("TXS called -- adr. mode: ", mode.String())
 	cpu.SP = cpu.X
 }
 
@@ -866,7 +866,7 @@ func (cpu *CPU) TXS(mode AddressingMode) {
 // N  Z C I D V
 // M7 * _ _ _ M6
 func (cpu *CPU) BIT(mode AddressingMode) {
-	log.Println("BIT called -- adr. mode: ", mode.toString())
+	log.Println("BIT called -- adr. mode: ", mode.String())
 	mem := cpu.getMemoryValue(mode)
 
 	cpu.setStatusNegative(mem&0x80 == 128)
@@ -879,7 +879,7 @@ func (cpu *CPU) BIT(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) BVC(mode AddressingMode) {
-	log.Println("BVC called -- adr.mode: ", mode.toString())
+	log.Println("BVC called -- adr.mode: ", mode.String())
 	if !cpu.getStatusOverflow() {
 		cpu.branch()
 
@@ -893,7 +893,7 @@ func (cpu *CPU) BVC(mode AddressingMode) {
 // N Z C I D V
 // _ _ _ _ _ _
 func (cpu *CPU) BVS(mode AddressingMode) {
-	log.Println("BVS called -- adr.mode: ", mode.toString())
+	log.Println("BVS called -- adr.mode: ", mode.String())
 	if cpu.getStatusOverflow() {
 		cpu.branch()
 
