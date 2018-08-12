@@ -43,7 +43,7 @@ func (cpu *CPU) ExecuteCycle() bool {
 	instrCode := cpu.Memory.ReadAbsolute(cpu.PC)
 	cpu.PC++
 
-	log.Printf("Next instruction code: %x \n", instrCode)
+	//log.Printf("Next instruction code: %x \n", instrCode)
 
 	// Resolve instruction by instruction code
 	instruction := cpu.instrTypes(instrCode)
@@ -59,7 +59,7 @@ func (cpu *CPU) callMethodReflection(instruction AssemblyInstruction) {
 	reflect.ValueOf(cpu).MethodByName(instruction.Type.String()).Call(inputs)
 }
 
-// fast
+// faster(?)
 func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
 	switch instruction.Type {
 	case BNE:
@@ -154,6 +154,20 @@ func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
 		cpu.BVS(instruction.AddressingMode)
 	case PLP:
 		cpu.PLP(instruction.AddressingMode)
+	case SEI:
+		cpu.SEI(instruction.AddressingMode)
+	case CLD:
+		cpu.CLD(instruction.AddressingMode)
+	case ORA:
+		cpu.ORA(instruction.AddressingMode)
+	case ROL:
+		cpu.ROL(instruction.AddressingMode)
+	case CLI:
+		cpu.CLI(instruction.AddressingMode)
+	case DEC:
+		cpu.DEC(instruction.AddressingMode)
+	case LSR:
+		cpu.LSR(instruction.AddressingMode)
 	default:
 		log.Println("[WARNING] Unimplemented instruction! ", instruction.Type.String())
 	}

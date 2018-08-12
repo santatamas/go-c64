@@ -1,6 +1,6 @@
 package MOS6510
 
-import "log"
+//import "log"
 
 type AssemblyInstruction struct {
 	Type           AssemblyInstructionType
@@ -269,7 +269,7 @@ func assemblyInstructions() func(byte) AssemblyInstruction {
 	}
 
 	return func(key byte) AssemblyInstruction {
-		log.Println("Resolving instruction by bytecode: ", key)
+		//log.Println("Resolving instruction by bytecode: ", key)
 		return innerMap[key]
 	}
 }

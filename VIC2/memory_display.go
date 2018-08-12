@@ -9,26 +9,30 @@ import (
 )
 
 type MemoryDisplay struct {
-	screenStartAddress     uint16
-	colorStartAddress      uint16
-	backgroundColorAddress uint16
-	frameColorAddress      uint16
-	memory                 *RAM.Memory
-	width                  int
-	height                 int
-	c64Characters          func(byte) rune
+	memory        *RAM.Memory
+	c64Characters func(byte) rune
 }
 
+const SCREEN_START_ADDR = uint16(0x400)
+const COLOR_START_ADDR = uint16(0xD800)
+const BACKGROUND_COLOR_ADDR = 0xD021
+const FRAME_COLOR_ADDR = 0xD020
+
+const RASTER_REGISTER_ADDR = 0xD012
+
+const TEXT_SCREEN_WIDTH = 40
+const TEXT_SCREEN_HEIGHT = 25
+
 func NewMemoryDisplay(memory *RAM.Memory) MemoryDisplay {
-	result := MemoryDisplay{0x400, 0xD800, 0xD021, 0xD020, memory, 40, 25, asciiCharacters()}
+	result := MemoryDisplay{memory, asciiCharacters()}
 	return result
 }
 
 func (display *MemoryDisplay) ReadCurrentState() [40][25]rune {
 	result := [40][25]rune{}
-	currentAdr := display.screenStartAddress
-	for y := 0; y < display.height; y++ {
-		for x := 0; x < display.width; x++ {
+	currentAdr := SCREEN_START_ADDR
+	for y := 0; y < TEXT_SCREEN_HEIGHT; y++ {
+		for x := 0; x < TEXT_SCREEN_WIDTH; x++ {
 			result[x][y] = display.c64Characters(display.memory.ReadAbsolute(currentAdr))
 			currentAdr++
 		}
@@ -38,24 +42,24 @@ func (display *MemoryDisplay) ReadCurrentState() [40][25]rune {
 
 func (display *MemoryDisplay) DrawState(screen tcell.Screen) {
 	st := tcell.StyleDefault
-	//backgroundColor := display.memory.ReadAbsolute(display.backgroundColorAddress)
-	st = st.Background(tcell.ColorWhite)
-	//st = st.Background(getColor(backgroundColor))
+	backgroundColor := display.memory.ReadAbsolute(BACKGROUND_COLOR_ADDR)
+	//st = st.Background(tcell.ColorWhite)
+	st = st.Background(getColor(backgroundColor))
 
-	frameColor := display.memory.ReadAbsolute(display.frameColorAddress)
+	frameColor := display.memory.ReadAbsolute(FRAME_COLOR_ADDR)
 	frameStyle := st.Background(getColor(frameColor))
 
-	for y := 0; y < display.height+2; y++ {
-		for x := 0; x < display.width+2; x++ {
+	for y := 0; y < TEXT_SCREEN_HEIGHT+2; y++ {
+		for x := 0; x < TEXT_SCREEN_WIDTH+2; x++ {
 			screen.SetCell(x, y, frameStyle, ' ')
 		}
 	}
 
-	currentAdr := display.screenStartAddress
-	currentColorAdr := display.colorStartAddress
+	currentAdr := SCREEN_START_ADDR
+	currentColorAdr := COLOR_START_ADDR
 
-	for y := 0; y < display.height; y++ {
-		for x := 0; x < display.width; x++ {
+	for y := 0; y < TEXT_SCREEN_HEIGHT; y++ {
+		for x := 0; x < TEXT_SCREEN_WIDTH; x++ {
 
 			color := display.memory.ReadAbsolute(currentColorAdr)
 			char := display.c64Characters(display.memory.ReadAbsolute(currentAdr))
@@ -116,6 +120,9 @@ loop:
 		}
 
 		display.DrawState(s)
+		//rasterReg := display.memory.ReadAbsolute(RASTER_REGISTER_ADDR)
+		//rasterReg++
+		display.memory.WriteAbsolute(RASTER_REGISTER_ADDR, 0)
 		time.Sleep(100 * time.Millisecond)
 	}
 

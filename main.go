@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-	programPathPtr := flag.String("prg-path", "./_resources/Phase1/Prg/4_Colors.prg", "The relative path of the program binary to load.")
+	programPathPtr := flag.String("prg-path", "", "The relative path of the program binary to load.")
 	delayPtr := flag.Int("delay", 0, "Artificial delay (in milliseconds) between CPU instructions.")
 	debugPtr := flag.Bool("debug", false, "Debug mode. If true, you can open http://localhost{:8080} to access the internal debug viewer.")
 	disableLogsPtr := flag.Bool("no-logs", false, "Disable logging. All log output is discarded.")
@@ -36,6 +36,12 @@ func main() {
 		}
 	}
 
-	emulator.loadFile(*programPathPtr)
+	if *programPathPtr == "" {
+		// set program counter to hard reset address
+		emulator.CPU.PC = 0xfce2
+	} else {
+		emulator.loadFile(*programPathPtr)
+	}
+
 	emulator.Start()
 }

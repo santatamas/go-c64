@@ -60,17 +60,17 @@ func TestCPU_statusIRQ(t *testing.T) {
 	}
 }
 
-func TestCPU_statusDecimate(t *testing.T) {
+func TestCPU_statusDecimal(t *testing.T) {
 	cpu := getTestCPU()
 
-	cpu.setStatusDecimate(true)
+	cpu.setStatusDecimal(true)
 
-	if !cpu.getStatusDecimate() {
-		t.Error("Decimate flag should be set!")
+	if !cpu.getStatusDecimal() {
+		t.Error("Decimal flag should be set!")
 	}
 
 	if cpu.S != 8 {
-		t.Error("Possible side effect on Decimate set!")
+		t.Error("Possible side effect on Decimal set!")
 	}
 }
 

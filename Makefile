@@ -3,6 +3,18 @@
 build:
 	go build -o ./dist/main
 
+run-colors:
+	go build -o ./dist/main
+	./dist/main -prg-path=_resources/prg/4_colors.prg
+
+run-addr:
+	go build -o ./dist/main
+	./dist/main -prg-path=_resources/prg/5_addressingmodes.prg
+
+run-monopole:
+	go build -o ./dist/main
+	./dist/main -prg-path=_resources/prg/monopole.prg
+
 run-snake:
 	go build -o ./dist/main
 	./dist/main -prg-path=_resources/prg/7_Snake.prg -no-logs=true
@@ -13,7 +25,11 @@ run-stack:
 
 run:
 	go build -o ./dist/main
-	./dist/main -prg-path=_resources/prg/4_Colors.prg -no-logs=true
+	./dist/main -no-logs=true
+
+run-log:
+	go build -o ./dist/main
+	./dist/main
 
 run-bin:
 	go build -o ./dist/main

@@ -51,7 +51,7 @@ func (c *CPU) getStatusIRQ() bool {
 	return c.S&0x04 == 0x04
 }
 
-func (c *CPU) setStatusDecimate(flag bool) {
+func (c *CPU) setStatusDecimal(flag bool) {
 	if flag {
 		c.S |= 0x08
 	} else {
@@ -59,7 +59,7 @@ func (c *CPU) setStatusDecimate(flag bool) {
 	}
 }
 
-func (c *CPU) getStatusDecimate() bool {
+func (c *CPU) getStatusDecimal() bool {
 	return c.S&0x08 == 0x08
 }
 

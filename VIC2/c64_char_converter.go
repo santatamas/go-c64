@@ -1,6 +1,7 @@
 package VIC2
 
 import (
+	//"log"
 	"strconv"
 	"strings"
 )
