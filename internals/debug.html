@@ -40,7 +40,7 @@ window.onload = function () {
         }
     }
 
-    /*document.getElementById("form").onsubmit = function () {
+    document.getElementById("form").onsubmit = function () {
         if (!conn) {
             return false;
         }
@@ -50,7 +50,7 @@ window.onload = function () {
         conn.send(msg.value);
         msg.value = "";
         return false;
-    };*/
+    };
 
     if (window["WebSocket"]) {
         conn = new WebSocket("ws://" + document.location.host + "/ws");
@@ -109,10 +109,12 @@ body {
 </style>
 </head>
 <body>
-<div id="log"></div>
-<!--<form id="form">
+    enter message:
+<form id="form">
     <input type="submit" value="Send" />
     <input type="text" id="msg" size="64"/>
-</form>-->
+</form>
+<div id="log"></div>
+
 </body>
 </html>

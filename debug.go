@@ -31,6 +31,7 @@ func startDebugServer() (hub *internals.Hub) {
 		internals.ServeWs(hub, w, r)
 	})
 	go http.ListenAndServe(*addr, nil)
+	log.Println("[DEBUG] Debug server is listening")
 	return hub
 }
 

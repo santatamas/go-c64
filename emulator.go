@@ -20,12 +20,13 @@ type Emulator struct {
 	cycleCount int64
 	pauseFlag  bool
 	Debug      bool
+	Test       bool
 	hub        *internals.Hub
 }
 
-func NewEmulator() Emulator {
+func NewEmulator(testMode bool) Emulator {
 
-	memory := RAM.NewMemory()
+	memory := RAM.NewMemory(testMode)
 	display := VIC2.NewMemoryDisplay(&memory)
 	cpu := MOS6510.NewCPU(&memory)
 
@@ -36,6 +37,7 @@ func NewEmulator() Emulator {
 		cycleCount: 0,
 		pauseFlag:  false,
 		Debug:      false,
+		Test:       false,
 	}
 }
 
@@ -47,16 +49,35 @@ func (emu *Emulator) Start() {
 				if !result {
 					break
 				}
+
 				emu.cycleCount++
-				//time.Sleep(emu.Delay * time.Millisecond)
 
 				if emu.Debug {
+					// artificial delay
+					time.Sleep((emu.Delay) * time.Millisecond)
+
 					// send CPU telemetry
-					emu.hub.Broadcast <- "TM|CPU-Execution"
+					emu.hub.Broadcast <- "TM|CPU-Execution|" + string(emu.cycleCount)
 				}
 			}
 		}
 	}()
+
+	if emu.Debug {
+		go func() {
+			for {
+				select {
+				case message := <-emu.hub.Broadcast:
+					if message == "pause" {
+						emu.pauseFlag = true
+					} else if message == "start" {
+						emu.pauseFlag = false
+					}
+				}
+			}
+		}()
+	}
+
 	emu.Display.Start()
 }
 

@@ -16,20 +16,22 @@ const ROM_KERNAL_ADDR = 0xE000
 const ROM_BASIC_ADDR = 0xA000
 const ROM_TEST_ADDR = 0x400
 
-func NewMemory() Memory {
+func NewMemory(testMode bool) Memory {
 	mem := Memory{make([]byte, 65536)}
 
-	//log.Println("[MEM] Loading BASIC ROM...")
-	//mem.LoadROM("./_resources/roms/basic.901226-01.bin", ROM_BASIC_ADDR)
+	if testMode {
+		log.Println("[MEM] Loading TEST ROM...")
+		mem.LoadROM("./_resources/tests/6502_functional_test.bin", ROM_TEST_ADDR)
+	} else {
+		log.Println("[MEM] Loading BASIC ROM...")
+		mem.LoadROM("./_resources/roms/basic.901226-01.bin", ROM_BASIC_ADDR)
 
-	//log.Println("[MEM] Loading CHAR ROM...")
-	//mem.LoadROM("./_resources/roms/characters.901225-01.bin", ROM_CHAR_ADDR)
+		log.Println("[MEM] Loading CHAR ROM...")
+		mem.LoadROM("./_resources/roms/characters.901225-01.bin", ROM_CHAR_ADDR)
 
-	//log.Println("[MEM] Loading KERNAL ROM...")
-	//mem.LoadROM("./_resources/roms/kernal.901227-03.bin", ROM_KERNAL_ADDR)
-
-	log.Println("[MEM] Loading TEST ROM...")
-	mem.LoadROM("./_resources/tests/6502_functional_test.bin", ROM_TEST_ADDR)
+		log.Println("[MEM] Loading KERNAL ROM...")
+		mem.LoadROM("./_resources/roms/kernal.901227-03.bin", ROM_KERNAL_ADDR)
+	}
 
 	return mem
 }

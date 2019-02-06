@@ -32,7 +32,7 @@ func NewCPU(mem *RAM.Memory) CPU {
 }
 
 func getTestCPU() (result CPU) {
-	memory := RAM.NewMemory()
+	memory := RAM.NewMemory(false)
 	return NewCPU(&memory)
 }
 
