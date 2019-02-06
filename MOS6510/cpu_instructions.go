@@ -18,6 +18,7 @@ func (cpu *CPU) getMemoryValue(mode AddressingMode) byte {
 		{
 			hi = cpu.Memory.ReadAbsolute(cpu.PC)
 			cpu.PC++
+			log.Println("Reading memory from zeropage address: ", hi)
 			hi = cpu.Memory.ReadZeroPage(hi)
 		}
 	case ZeroPageX:
@@ -40,6 +41,8 @@ func (cpu *CPU) getMemoryValue(mode AddressingMode) byte {
 			cpu.PC++
 			adr_lo := cpu.Memory.ReadAbsolute(cpu.PC)
 			cpu.PC++
+
+			log.Println("Reading memory from absolute address: ", n.ToInt16([]byte{adr_hi, adr_lo}))
 
 			hi = cpu.Memory.ReadAbsolute(n.ToInt16([]byte{adr_hi, adr_lo}))
 		}
@@ -126,19 +129,20 @@ func (cpu *CPU) ADC(mode AddressingMode) {
 
 	hi := cpu.getMemoryValue(mode)
 
-	if cpu.getStatusCarry() {
-		hi++
-	}
-
-	cpu.setStatusCarry(uint16(cpu.A)+uint16(hi) > 255)
-
 	result := cpu.A + hi
 
-	isOverflow := (((cpu.A ^ hi) & 0x80) == 0) && ((cpu.A^result)&0x80) != 0
+	if cpu.getStatusCarry() {
+		result++
+	}
+
+	cpu.setStatusCarry(int(result) > 255)
+
+	isOverflow := (((cpu.A ^ hi) & 0x80) == 0) && (((cpu.A ^ result) & 0x80) != 0)
 	cpu.setStatusOverflow(isOverflow)
 	cpu.setStatusZero(result == 0)
 
 	cpu.A = result
+	cpu.setStatusNegative((cpu.A & 0x80) != 0)
 }
 
 // BCS Branch on carry set
@@ -846,20 +850,32 @@ func (cpu *CPU) SBC(mode AddressingMode) {
 	log.Println("SBC called -- adr. mode: ", mode.String())
 
 	mem := cpu.getMemoryValue(mode)
+	log.Println("SBC - memory value: ", mem)
+	log.Println("SBC - register A value: ", cpu.A)
 
 	result := cpu.A - mem
-	if !cpu.getStatusCarry() {
+
+	memInt := int(mem)
+	cpuAInt := int(cpu.A)
+	intResult := cpuAInt - memInt
+	log.Println("SBC - intResult: ", intResult)
+
+	if cpu.getStatusCarry() {
 		result--
+		intResult--
 	}
 
-	cpu.setStatusCarry(cpu.A > mem)
-	//cpu.setStatusCarry(uint16(result) < 0x100)
+	cpu.setStatusCarry(intResult < 0)
+	log.Println("SBC - carry value: ", intResult < 0)
 
-	isOverflow := (((cpu.A ^ result) & 0x80) != 0) && ((cpu.A^mem)&0x80) != 0
+	isOverflow := (((cpu.A ^ result) & 0x80) != 0) && (((cpu.A ^ mem) & 0x80) != 0)
+	log.Println("SBC - isOverFlow: ", isOverflow)
 	cpu.setStatusOverflow(isOverflow)
 	cpu.setStatusZero(result == 0)
 
+	log.Println("Setting CPU register A to: ", result)
 	cpu.A = result
+	cpu.setStatusNegative((cpu.A & 0x80) != 0)
 }
 
 // ROR Rotate one bit right (memory or accumulator)
@@ -902,7 +918,7 @@ func (cpu *CPU) ROL(mode AddressingMode) {
 	}
 
 	cpu.setStatusCarry(cpu.A&0x80 != 0)
-	cpu.A = cpu.A<<1 | previousC>>7
+	cpu.A = cpu.A<<1 | previousC
 
 	cpu.setStatusNegative(cpu.A&0x80 != 0)
 	cpu.setStatusZero(cpu.A == 0)
@@ -1050,7 +1066,7 @@ func (cpu *CPU) BIT(mode AddressingMode) {
 	mem := cpu.getMemoryValue(mode)
 
 	cpu.setStatusNegative(mem&0x80 != 0)
-	cpu.setStatusOverflow(mem&64 != 0)
+	cpu.setStatusOverflow(mem&0x40 != 0)
 	cpu.setStatusZero(mem&cpu.A == 0)
 }
 
@@ -1118,7 +1134,7 @@ func (cpu *CPU) ORA(mode AddressingMode) {
 
 	mem := cpu.getMemoryValue(mode)
 
-	cpu.A = mem | cpu.A
+	cpu.A = cpu.A | mem
 
 	cpu.setStatusZero(cpu.A == 0)
 	cpu.setStatusNegative(cpu.A&0x80 != 0)

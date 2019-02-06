@@ -38,7 +38,8 @@ func main() {
 
 	if *programPathPtr == "" {
 		// set program counter to hard reset address
-		emulator.CPU.PC = 0xfce2
+		//emulator.CPU.PC = 0xfce2
+		emulator.CPU.PC = 0x400
 	} else {
 		emulator.loadFile(*programPathPtr)
 	}
