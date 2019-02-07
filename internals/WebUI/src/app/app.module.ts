@@ -8,6 +8,8 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { LogsComponent } from './logs/logs.component';
+import { WebsocketService } from './services/websocket.service';
+import { TelemetryService } from './services/telemetry.service';
 
 
 @NgModule({
@@ -23,7 +25,7 @@ import { LogsComponent } from './logs/logs.component';
     MatIconModule,
     MatButtonModule
   ],
-  providers: [],
+  providers: [WebsocketService, TelemetryService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -12,8 +12,8 @@ export class TelemetryService {
 
   constructor(private webSocket: WebsocketService) {
     const openSubscriber = Subscriber.create(() => console.log('connection opened'));
-    this.observableSocket = this.webSocket.createObservableSocket('ws://localhost:8000', openSubscriber).pipe(
-      map(message => JSON.parse(message)));
+    this.observableSocket = this.webSocket.createObservableSocket('ws://localhost:8080/ws', openSubscriber).pipe(
+      map(message => message));
   }
 
   getTelemetry(): Observable<any> {

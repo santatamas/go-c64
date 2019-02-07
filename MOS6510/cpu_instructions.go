@@ -135,7 +135,7 @@ func (cpu *CPU) ADC(mode AddressingMode) {
 		result++
 	}
 
-	cpu.setStatusCarry(int(result) > 255)
+	cpu.setStatusCarry(uint16(cpu.A)+uint16(hi) > 255)
 
 	isOverflow := (((cpu.A ^ hi) & 0x80) == 0) && (((cpu.A ^ result) & 0x80) != 0)
 	cpu.setStatusOverflow(isOverflow)
@@ -918,7 +918,7 @@ func (cpu *CPU) ROL(mode AddressingMode) {
 	}
 
 	cpu.setStatusCarry(cpu.A&0x80 != 0)
-	cpu.A = cpu.A<<1 | previousC
+	cpu.A = cpu.A<<1 | previousC>>7
 
 	cpu.setStatusNegative(cpu.A&0x80 != 0)
 	cpu.setStatusZero(cpu.A == 0)
