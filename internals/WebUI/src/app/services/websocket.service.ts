@@ -1,8 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subscriber, Observable } from 'rxjs';
 
-const SERVER_URL = 'http://localhost:8080';
-
 @Injectable({
   providedIn: 'root'
 })

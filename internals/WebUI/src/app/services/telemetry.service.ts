@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { WebsocketService } from './websocket.service';
-import { Observable, Subscriber } from 'rxjs';
+import { Observable, Subscriber, observable } from 'rxjs';
 import { map, filter, scan } from 'rxjs/operators';
 
 @Injectable({
@@ -8,13 +8,19 @@ import { map, filter, scan } from 'rxjs/operators';
 })
 export class TelemetryService {
 
-  constructor(private webSocket: WebsocketService) {}
+  observableSocket: Observable<any>;
 
-  watchProduct(productId: number): Observable<any> {
-    const openSubscriber = Subscriber.create(
-        () => this.webSocket.send({productId: productId}));
+  constructor(private webSocket: WebsocketService) {
+    const openSubscriber = Subscriber.create(() => console.log('connection opened'));
+    this.observableSocket = this.webSocket.createObservableSocket('ws://localhost:8000', openSubscriber).pipe(
+      map(message => JSON.parse(message)));
+  }
 
-    return this.webSocket.createObservableSocket('ws://localhost:8000', openSubscriber).pipe(
-        map(message => JSON.parse(message)));
+  getTelemetry(): Observable<any> {
+    return this.observableSocket;
+  }
+
+  sendCommand(command: string) {
+    this.webSocket.send(command);
   }
 }
