@@ -36,11 +36,15 @@ func NewMemory(testMode bool) Memory {
 	return mem
 }
 
-func (m Memory) ReadZeroPage(zeroPageAddress byte) byte {
+func (m *Memory) ReadAll() []byte {
+	return m.memory
+}
+
+func (m *Memory) ReadZeroPage(zeroPageAddress byte) byte {
 	return m.memory[zeroPageAddress]
 }
 
-func (m Memory) ReadAbsolute(absoluteAddress uint16) byte {
+func (m *Memory) ReadAbsolute(absoluteAddress uint16) byte {
 	return m.memory[absoluteAddress]
 }
 

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Subscriber, Observable } from 'rxjs';
+import { Subscriber, Observable, Subject } from 'rxjs';
+import { Telemetry } from '../models/telemetry.model';
 
 @Injectable({
   providedIn: 'root'
@@ -7,10 +8,12 @@ import { Subscriber, Observable } from 'rxjs';
 export class WebsocketService {
 
   private ws: WebSocket;
+  private observable: Observable<any>;
+  private subject: Subject<any> = new Subject<any>();
 
-  createObservableSocket(url: string, openSubscriber: Subscriber<any>): Observable<any> {
+  createObservableSocket(url: string, openSubscriber: Subscriber<any>): Subject<any> {
     this.ws = new WebSocket(url);
-    return new Observable(observer => {
+    new Observable(observer => {
       this.ws.onmessage = event => observer.next(event.data);
       this.ws.onerror = event => observer.error(event);
       this.ws.onclose = event => observer.complete();
@@ -20,7 +23,9 @@ export class WebsocketService {
       };
 
       return () => this.ws.close();
-    });
+    }).subscribe((data) => { this.subject.next(data); });
+
+    return this.subject;
   }
 
   send(message: any) {

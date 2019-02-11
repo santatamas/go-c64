@@ -1,0 +1,44 @@
+<p>
+  Emulator Controls
+  <br />
+    <button (click)="startEmulator()" mat-button >Start</button>
+    <button (click)="stopEmulator()" mat-button >Stop</button>
+    <button (click)="executeNext()" mat-button >Execute Next</button>
+    <button (click)="getCPUState()" mat-button >CPU State</button>
+    <button (click)="getEmulatorState()" mat-button >Emulator State</button>
+    <button (click)="getMemoryContent()" mat-button >Memory Content</button>
+</p>
+
+<table class="mat-elevation-z2">
+
+    <tr>
+      <th> Emulator property </th>
+      <th> Value </th>
+    </tr>
+
+    <tr>
+        <td >Delay</td>
+        <td >{{state.Delay}}</td>
+    </tr>
+
+    <tr>
+        <td >Cycle Count</td>
+        <td >{{state.CycleCount}}</td>
+    </tr>
+
+    <tr>
+        <td >Paused</td>
+        <td >{{state.PauseFlag}}</td>
+    </tr>
+
+    <tr>
+        <td >Debug</td>
+        <td >{{state.Debug}}</td>
+    </tr>
+
+    <tr>
+        <td >Test</td>
+        <td >{{state.Test}}</td>
+    </tr>
+</table>
+

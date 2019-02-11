@@ -1,4 +1,4 @@
 export class Telemetry {
-    type: string;
-    payload: any;
+    Command: string;
+    Payload: any;
 }

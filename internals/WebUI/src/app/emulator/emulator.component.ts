@@ -1,23 +1,27 @@
 import { Component, OnInit } from '@angular/core';
 import { TelemetryService } from '../services/telemetry.service';
 import { Telemetry } from '../models/telemetry.model';
+import { EmulatorState } from '../models/emulatorstate.model';
 
 @Component({
-  selector: 'app-logs',
-  templateUrl: './logs.component.html',
-  styleUrls: ['./logs.component.scss']
+  selector: 'app-emulator',
+  templateUrl: './emulator.component.html',
+  styleUrls: ['./emulator.component.scss']
 })
-export class LogsComponent implements OnInit {
+export class EmulatorComponent implements OnInit {
 
   latestMessage: string;
+  public state: EmulatorState;
 
   constructor(private telemetryService: TelemetryService) {
+    this.state = new EmulatorState();
+
     telemetryService.getTelemetry().subscribe((t: string) => {
       const telemetry: Telemetry = JSON.parse(t);
-      console.log(telemetry);
-      console.log(atob(telemetry.Payload));
-      // console.log("message received");
-      this.latestMessage = atob(telemetry.Payload);
+
+      if (telemetry.Command === '"GetEmulatorState"') {
+        this.state = JSON.parse(atob(telemetry.Payload));
+      }
     });
    }
 
@@ -37,6 +41,14 @@ export class LogsComponent implements OnInit {
   executeNext() {
     console.log('execute next instruction called');
     this.telemetryService.sendCommand('ExecuteNext');
+
+    setTimeout(() => {
+      this.telemetryService.sendCommand('GetCPUState');
+    }, 50);
+
+    setTimeout(() => {
+      this.telemetryService.sendCommand('GetEmulatorState');
+    }, 100);
   }
 
   getCPUState() {
@@ -53,4 +65,5 @@ export class LogsComponent implements OnInit {
     console.log('get Memory content called');
     this.telemetryService.sendCommand('GetMemoryContent');
   }
+
 }

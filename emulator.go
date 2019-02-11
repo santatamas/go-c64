@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/santatamas/go-c64/MOS6510"
 	"github.com/santatamas/go-c64/RAM"
@@ -24,6 +25,14 @@ type Emulator struct {
 	hub        *internals.Hub
 }
 
+type EmulatorState struct {
+	Delay      time.Duration
+	CycleCount int64
+	PauseFlag  bool
+	Debug      bool
+	Test       bool
+}
+
 func NewEmulator(testMode bool) Emulator {
 
 	memory := RAM.NewMemory(testMode)
@@ -42,6 +51,68 @@ func NewEmulator(testMode bool) Emulator {
 }
 
 func (emu *Emulator) Start() {
+
+	if emu.Debug {
+
+		emu.pauseFlag = true
+
+		go func() {
+			for {
+				select {
+				case message := <-emu.hub.Broadcast:
+					var command internals.Command
+					command.UnmarshalJSON([]byte(message))
+
+					var state []byte
+					switch command {
+					case internals.Start:
+						{
+							emu.pauseFlag = false
+							state, _ = json.Marshal("OK")
+						}
+					case internals.Stop:
+						{
+							emu.pauseFlag = true
+							state, _ = json.Marshal("OK")
+						}
+					case internals.ExecuteNext:
+						{
+							emu.CPU.ExecuteCycle()
+							emu.cycleCount++
+							state, _ = json.Marshal("OK")
+						}
+					case internals.GetCPUState:
+						{
+							state, _ = json.Marshal(emu.CPU.GetState())
+						}
+					case internals.GetEmulatorState:
+						{
+							emuState := EmulatorState{
+								Delay:      emu.Delay,
+								CycleCount: emu.cycleCount,
+								Debug:      emu.Debug,
+								Test:       emu.Test,
+								PauseFlag:  emu.pauseFlag,
+							}
+							state, _ = json.Marshal(emuState)
+						}
+					case internals.GetMemoryContent:
+						{
+							state, _ = json.Marshal(emu.CPU.Memory.ReadAll())
+						}
+					}
+
+					telemetry := internals.Telemetry{
+						Command: message,
+						Payload: state,
+					}
+					response, _ := json.Marshal(telemetry)
+					emu.hub.Broadcast <- string(response)
+				}
+			}
+		}()
+	}
+
 	go func() {
 		for {
 			if !emu.pauseFlag {
@@ -51,34 +122,11 @@ func (emu *Emulator) Start() {
 				}
 
 				emu.cycleCount++
-
-				if emu.Debug {
-					// artificial delay
-					time.Sleep((emu.Delay) * time.Millisecond)
-
-					// send CPU telemetry
-					emu.hub.Broadcast <- "TM|CPU-Execution|" + string(emu.cycleCount)
-				}
 			}
 		}
 	}()
 
-	if emu.Debug {
-		go func() {
-			for {
-				select {
-				case message := <-emu.hub.Broadcast:
-					if message == "pause" {
-						emu.pauseFlag = true
-					} else if message == "start" {
-						emu.pauseFlag = false
-					}
-				}
-			}
-		}()
-	}
-
-	emu.Display.Start()
+	//emu.Display.Start()
 }
 
 func (emu *Emulator) loadFile(path string) {

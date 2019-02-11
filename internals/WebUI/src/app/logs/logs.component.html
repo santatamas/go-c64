@@ -1,4 +1,12 @@
 <p>
-  logs works!
+    <button (click)="startEmulator()" mat-button >Start</button>
+    <button (click)="stopEmulator()" mat-button >Stop</button>
+    <button (click)="executeNext()" mat-button >Execute Next</button>
+    <button (click)="getCPUState()" mat-button >Get CPU State</button>
+    <button (click)="getEmulatorState()" mat-button >Get Emulator State</button>
+    <button (click)="getMemoryContent()" mat-button >Get Memory Content</button>
+
+    <br/>
   {{ latestMessage }}
+
 </p>

@@ -10,12 +10,19 @@ import { MatButtonModule } from '@angular/material/button';
 import { LogsComponent } from './logs/logs.component';
 import { WebsocketService } from './services/websocket.service';
 import { TelemetryService } from './services/telemetry.service';
+import { CPUComponent } from './cpu/cpu.component';
+import { MemoryComponent } from './memory/memory.component';
+import { EmulatorComponent } from './emulator/emulator.component';
+import { MatTableModule } from '@angular/material/table';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    LogsComponent
+    LogsComponent,
+    CPUComponent,
+    MemoryComponent,
+    EmulatorComponent
   ],
   imports: [
     BrowserModule,
@@ -23,7 +30,8 @@ import { TelemetryService } from './services/telemetry.service';
     BrowserAnimationsModule,
     MatToolbarModule,
     MatIconModule,
-    MatButtonModule
+    MatButtonModule,
+    MatTableModule
   ],
   providers: [WebsocketService, TelemetryService],
   bootstrap: [AppComponent]

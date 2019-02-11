@@ -37,4 +37,4 @@ run-bin:
 
 debug:
 	go build -o ./dist/main
-	./dist/main -debug=true -prg-path=_resources/prg/7_Snake.prg
+	./dist/main -debug=true -prg-path=_resources/prg/1_First.prg

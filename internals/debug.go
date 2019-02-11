@@ -1,8 +1,7 @@
-package main
+package internals
 
 import (
 	"flag"
-	"github.com/santatamas/go-c64/internals"
 	"log"
 	"net/http"
 )
@@ -19,16 +18,16 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	http.ServeFile(w, r, "internals/debug.html")
+	http.ServeFile(w, r, "WebUI/debug.html")
 }
 
-func startDebugServer() (hub *internals.Hub) {
-	hub = internals.NewHub()
+func StartDebugServer() (hub *Hub) {
+	hub = NewHub()
 	go hub.Run()
 
 	http.HandleFunc("/", serveHome)
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		internals.ServeWs(hub, w, r)
+		ServeWs(hub, w, r)
 	})
 	go http.ListenAndServe(*addr, nil)
 	log.Println("[DEBUG] Debug server is listening")
@@ -36,11 +35,11 @@ func startDebugServer() (hub *internals.Hub) {
 }
 
 type DebugLog struct {
-	hub *internals.Hub
+	Hub *Hub
 }
 
 func (d DebugLog) Write(p []byte) (n int, err error) {
 	decodedMessage := string(p)
-	d.hub.Broadcast <- decodedMessage
+	d.Hub.Broadcast <- decodedMessage
 	return len(p), nil
 }
