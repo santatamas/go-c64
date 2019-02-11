@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { WebsocketService } from './websocket.service';
 import { Observable, Subscriber, observable, Subject } from 'rxjs';
 import { map, filter, scan } from 'rxjs/operators';
+import { Telemetry } from '../models/telemetry.model';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +19,13 @@ export class TelemetryService {
     return this.observableSocket;
   }
 
-  sendCommand(command: string) {
-    this.webSocket.send(command);
+  sendStringCommand(command: string) {
+    const telemetryRequest = new Telemetry();
+    telemetryRequest.Command = command;
+    this.sendCommand(telemetryRequest);
+  }
+
+  sendCommand(request: Telemetry) {
+    this.webSocket.send(JSON.stringify(request));
   }
 }

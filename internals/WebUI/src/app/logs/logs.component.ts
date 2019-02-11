@@ -26,31 +26,31 @@ export class LogsComponent implements OnInit {
 
   startEmulator() {
     console.log('start emulator called');
-    this.telemetryService.sendCommand('Start');
+    this.telemetryService.sendStringCommand('Start');
   }
 
   stopEmulator() {
     console.log('stop emulator called');
-    this.telemetryService.sendCommand('Stop');
+    this.telemetryService.sendStringCommand('Stop');
   }
 
   executeNext() {
     console.log('execute next instruction called');
-    this.telemetryService.sendCommand('ExecuteNext');
+    this.telemetryService.sendStringCommand('ExecuteNext');
   }
 
   getCPUState() {
     console.log('get CPU state called');
-    this.telemetryService.sendCommand('GetCPUState');
+    this.telemetryService.sendStringCommand('GetCPUState');
   }
 
   getEmulatorState() {
     console.log('get Emulator state called');
-    this.telemetryService.sendCommand('GetEmulatorState');
+    this.telemetryService.sendStringCommand('GetEmulatorState');
   }
 
   getMemoryContent() {
     console.log('get Memory content called');
-    this.telemetryService.sendCommand('GetMemoryContent');
+    this.telemetryService.sendStringCommand('GetMemoryContent');
   }
 }

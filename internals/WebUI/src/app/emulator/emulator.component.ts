@@ -19,7 +19,7 @@ export class EmulatorComponent implements OnInit {
     telemetryService.getTelemetry().subscribe((t: string) => {
       const telemetry: Telemetry = JSON.parse(t);
 
-      if (telemetry.Command === '"GetEmulatorState"') {
+      if (telemetry.Command === 'GetEmulatorState') {
         this.state = JSON.parse(atob(telemetry.Payload));
       }
     });
@@ -28,42 +28,52 @@ export class EmulatorComponent implements OnInit {
   ngOnInit() {
   }
 
+  setBreakpoint(value: string) {
+    const telemetryRequest = new Telemetry();
+    telemetryRequest.Command = 'SetBreakpoint';
+    // convert from hex to dec
+    const dec = parseInt(value, 16);
+    // set the decimal number as a parameter on the command
+    telemetryRequest.Parameter = dec.toString();
+    this.telemetryService.sendCommand(telemetryRequest);
+  }
+
   startEmulator() {
     console.log('start emulator called');
-    this.telemetryService.sendCommand('Start');
+    this.telemetryService.sendStringCommand('Start');
   }
 
   stopEmulator() {
     console.log('stop emulator called');
-    this.telemetryService.sendCommand('Stop');
+    this.telemetryService.sendStringCommand('Stop');
   }
 
   executeNext() {
     console.log('execute next instruction called');
-    this.telemetryService.sendCommand('ExecuteNext');
+    this.telemetryService.sendStringCommand('ExecuteNext');
 
     setTimeout(() => {
-      this.telemetryService.sendCommand('GetCPUState');
+      this.telemetryService.sendStringCommand('GetCPUState');
     }, 50);
 
     setTimeout(() => {
-      this.telemetryService.sendCommand('GetEmulatorState');
+      this.telemetryService.sendStringCommand('GetEmulatorState');
     }, 100);
   }
 
   getCPUState() {
     console.log('get CPU state called');
-    this.telemetryService.sendCommand('GetCPUState');
+    this.telemetryService.sendStringCommand('GetCPUState');
   }
 
   getEmulatorState() {
     console.log('get Emulator state called');
-    this.telemetryService.sendCommand('GetEmulatorState');
+    this.telemetryService.sendStringCommand('GetEmulatorState');
   }
 
   getMemoryContent() {
     console.log('get Memory content called');
-    this.telemetryService.sendCommand('GetMemoryContent');
+    this.telemetryService.sendStringCommand('GetMemoryContent');
   }
 
 }

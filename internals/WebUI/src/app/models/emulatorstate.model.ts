@@ -4,4 +4,5 @@ export class EmulatorState {
     PauseFlag: boolean;
     Debug: boolean;
     Test: boolean;
+    BreakAddr: number;
 }

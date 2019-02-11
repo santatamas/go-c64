@@ -2,7 +2,8 @@ package internals
 
 import (
 	"bytes"
-	"encoding/json"
+	//"encoding/json"
+	//"log"
 )
 
 // Command represents a debugger command sent from the WebUI
@@ -11,10 +12,12 @@ type Command int
 const (
 	Start Command = iota + 1
 	Stop
+	Reset
 	ExecuteNext
 	GetCPUState
 	GetEmulatorState
 	GetMemoryContent
+	SetBreakpoint
 )
 
 func (s Command) String() string {
@@ -24,19 +27,23 @@ func (s Command) String() string {
 var toString = map[Command]string{
 	Start:            "Start",
 	Stop:             "Stop",
+	Reset:            "Reset",
 	ExecuteNext:      "ExecuteNext",
 	GetCPUState:      "GetCPUState",
 	GetEmulatorState: "GetEmulatorState",
 	GetMemoryContent: "GetMemoryContent",
+	SetBreakpoint:    "SetBreakpoint",
 }
 
 var toID = map[string]Command{
 	"Start":            Start,
 	"Stop":             Stop,
+	"Reset":            Reset,
 	"ExecuteNext":      ExecuteNext,
 	"GetCPUState":      GetCPUState,
 	"GetEmulatorState": GetEmulatorState,
 	"GetMemoryContent": GetMemoryContent,
+	"SetBreakpoint":    SetBreakpoint,
 }
 
 // MarshalJSON marshals the enum as a quoted json string
@@ -48,13 +55,7 @@ func (s Command) MarshalJSON() ([]byte, error) {
 }
 
 // UnmarshalJSON unmashals a quoted json string to the enum value
-func (s *Command) UnmarshalJSON(b []byte) error {
-	var j string
-	err := json.Unmarshal(b, &j)
-	if err != nil {
-		return err
-	}
-	// Note that if the string cannot be found then it will be set to the zero value, 'Created' in this case.
-	*s = toID[j]
+func (s *Command) UnmarshalJSON(b string) error {
+	*s = toID[b]
 	return nil
 }

@@ -22,7 +22,7 @@ export class MemoryComponent implements OnInit {
     telemetryService.getTelemetry().subscribe((t: string) => {
       const telemetry: Telemetry = JSON.parse(t);
 
-      if (telemetry.Command === '"GetMemoryContent"') {
+      if (telemetry.Command === 'GetMemoryContent') {
 
         let byteCharacters = atob(telemetry.Payload);
 

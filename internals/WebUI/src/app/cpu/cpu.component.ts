@@ -17,7 +17,7 @@ export class CPUComponent implements OnInit {
     this.state = new CPUState();
     telemetryService.getTelemetry().subscribe((t: string) => {
       const telemetry: Telemetry = JSON.parse(t);
-      if (telemetry.Command === '"GetCPUState"') {
+      if (telemetry.Command === 'GetCPUState') {
         this.state = JSON.parse(atob(telemetry.Payload));
       }
     });

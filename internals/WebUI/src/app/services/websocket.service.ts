@@ -23,12 +23,12 @@ export class WebsocketService {
       };
 
       return () => this.ws.close();
-    }).subscribe((data) => { this.subject.next(data); });
+    }).subscribe((data) => { this.subject.next(data); console.log(data); });
 
     return this.subject;
   }
 
   send(message: any) {
-    this.ws.send(JSON.stringify(message));
+    this.ws.send(message);
   }
 }

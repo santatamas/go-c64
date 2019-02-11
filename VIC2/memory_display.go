@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gdamore/tcell"
 	"github.com/santatamas/go-c64/RAM"
+	"log"
 	"os"
 	"time"
 )
@@ -124,6 +125,7 @@ loop:
 		//rasterReg++
 		display.memory.WriteAbsolute(RASTER_REGISTER_ADDR, 0)
 		time.Sleep(100 * time.Millisecond)
+		//log.Println("screen refresh")
 	}
 
 	s.Fini()

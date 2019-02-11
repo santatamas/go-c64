@@ -7,6 +7,10 @@
     <button (click)="getCPUState()" mat-button >CPU State</button>
     <button (click)="getEmulatorState()" mat-button >Emulator State</button>
     <button (click)="getMemoryContent()" mat-button >Memory Content</button>
+    <br/>
+    <input #box>
+    <button (click)="setBreakpoint(box.value)" mat-button >Set breakpoint</button>
+
 </p>
 
 <table class="mat-elevation-z2">
@@ -39,6 +43,11 @@
     <tr>
         <td >Test</td>
         <td >{{state.Test}}</td>
+    </tr>
+
+    <tr>
+        <td >Break Address</td>
+        <td >{{state.BreakAddr}}</td>
     </tr>
 </table>
 

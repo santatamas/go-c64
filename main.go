@@ -1,7 +1,7 @@
 package main
 
 import (
-	"bufio"
+	//"bufio"
 	"flag"
 	"github.com/santatamas/go-c64/internals"
 	"io/ioutil"
@@ -22,6 +22,16 @@ func main() {
 	emulator := NewEmulator(*testModePtr)
 	emulator.Delay = time.Duration(*delayPtr)
 
+	// set normal file logging
+	if !*disableLogsPtr {
+		file, _ := os.OpenFile("log.txt", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
+		log.SetOutput(file)
+		log.Println("[DEBUG] Logging to file: log.txt")
+	} else {
+		log.Println("[DEBUG] Logging is disabled.")
+		log.SetOutput(ioutil.Discard)
+	}
+
 	if *debugPtr {
 		log.Println("[DEBUG] Starting debug server...")
 		hub := internals.StartDebugServer()
@@ -35,25 +45,20 @@ func main() {
 		emulator.hub = hub
 	}
 
-	// set normal file logging
-	if !*disableLogsPtr {
-		//		file, _ := os.OpenFile("log.txt", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
-		//log.SetOutput(file)
-	} else {
-		log.SetOutput(ioutil.Discard)
-	}
-
 	if *testModePtr {
+		log.Println("[DEBUG] Test mode ON, setting PC to test ROM start address")
 		// set program counter to test ROM start address
 		emulator.CPU.PC = 0x400
 	} else if *programPathPtr == "" {
+		log.Println("[DEBUG] Setting PC to hard reset address")
 		// set program counter to hard reset address
 		emulator.CPU.PC = 0xfce2
 	} else {
+		log.Println("[DEBUG] Loading PRG...")
 		emulator.loadFile(*programPathPtr)
 	}
 
 	emulator.Start()
 
-	bufio.NewReader(os.Stdin).ReadBytes('\n')
+	//bufio.NewReader(os.Stdin).ReadBytes('\n')
 }

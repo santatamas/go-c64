@@ -1,6 +1,7 @@
 package internals
 
 type Telemetry struct {
-	Command string
-	Payload []byte
+	Command   string
+	Parameter string
+	Payload   []byte
 }
