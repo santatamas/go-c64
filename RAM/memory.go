@@ -24,13 +24,13 @@ func NewMemory(testMode bool) Memory {
 		mem.LoadROM("./_resources/tests/6502_functional_test.bin", ROM_TEST_ADDR)
 	} else {
 		log.Println("[MEM] Loading BASIC ROM...")
-		mem.LoadROM("./_resources/roms/basic.901226-01.bin", ROM_BASIC_ADDR)
+		//mem.LoadROM("./_resources/roms/basic.901226-01.bin", ROM_BASIC_ADDR)
 
 		log.Println("[MEM] Loading CHAR ROM...")
-		mem.LoadROM("./_resources/roms/characters.901225-01.bin", ROM_CHAR_ADDR)
+		//mem.LoadROM("./_resources/roms/characters.901225-01.bin", ROM_CHAR_ADDR)
 
 		log.Println("[MEM] Loading KERNAL ROM...")
-		mem.LoadROM("./_resources/roms/kernal.901227-03.bin", ROM_KERNAL_ADDR)
+		//mem.LoadROM("./_resources/roms/kernal.901227-03.bin", ROM_KERNAL_ADDR)
 	}
 
 	return mem

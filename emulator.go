@@ -98,7 +98,7 @@ func (emu *Emulator) Start() {
 						}
 					case internals.GetMemoryContent:
 						{
-							state, _ = json.Marshal(emu.CPU.Memory.ReadAll())
+							state = emu.CPU.Memory.ReadAll()
 						}
 					}
 
