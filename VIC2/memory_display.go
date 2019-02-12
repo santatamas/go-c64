@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"github.com/gdamore/tcell"
 	"github.com/santatamas/go-c64/RAM"
-	"log"
+	//"log"
 	"os"
 	"time"
 )
