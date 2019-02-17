@@ -1,0 +1,13 @@
+<p>
+  <button *ngIf="state.PauseFlag" (click)="startEmulator()" title="Start emulator" mat-button ><mat-icon class="build">play_arrow</mat-icon></button>
+  <button *ngIf="!state.PauseFlag" (click)="stopEmulator()" title="Pause emulator" mat-button ><mat-icon class="build">pause_arrow</mat-icon></button>
+  <button (click)="executeNext()" title="Execute next" mat-button ><mat-icon class="build">skip_next</mat-icon></button>
+  <button (click)="getCPUState()" title="Get CPU state" mat-button ><mat-icon class="build">memory</mat-icon></button>
+  <button (click)="getEmulatorState()" title="Get Emulator state" mat-button ><mat-icon class="build">computer</mat-icon></button>
+  <button (click)="getMemoryContent()" title="Get memory content" mat-button ><mat-icon class="build">sd_card</mat-icon></button>
+  <button (click)="reconnect()" title="Reconnect" mat-button ><mat-icon class="build">cached</mat-icon></button>
+
+  <input #box>
+  <button (click)="setBreakpoint(box.value)" mat-button >Set breakpoint</button>
+
+</p>

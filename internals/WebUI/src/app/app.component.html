@@ -1,23 +1,15 @@
 <mat-toolbar color="primary">
-
     <mat-toolbar-row>
-      <mat-icon class="build">build</mat-icon>
-
-      <button mat-button >CPU</button>
-      <button mat-button >Memory</button>
-      <button mat-button >Logs</button>
-
+      <app-controls></app-controls>
       <span class="example-spacer"></span>
       <mat-icon class="example-icon">pets</mat-icon>
     </mat-toolbar-row>
   </mat-toolbar>
 
-
-<app-emulator></app-emulator>
-<br />
-<app-cpu></app-cpu>
-<app-memory></app-memory>
-<!-- <app-logs></app-logs> -->
-
+  <div style="padding:20px;">
+    <app-emulator></app-emulator>
+    <app-cpu></app-cpu>
+    <app-memory></app-memory>
+  </div>
 
 <router-outlet></router-outlet>

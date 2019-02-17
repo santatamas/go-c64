@@ -1,53 +1,33 @@
-<p>
-  Emulator Controls
-  <br />
-    <button (click)="startEmulator()" mat-button >Start</button>
-    <button (click)="stopEmulator()" mat-button >Stop</button>
-    <button (click)="executeNext()" mat-button >Execute Next</button>
-    <button (click)="getCPUState()" mat-button >CPU State</button>
-    <button (click)="getEmulatorState()" mat-button >Emulator State</button>
-    <button (click)="getMemoryContent()" mat-button >Memory Content</button>
-    <br/>
-    <input #box>
-    <button (click)="setBreakpoint(box.value)" mat-button >Set breakpoint</button>
 
-</p>
+<mat-card class="example-card">
+    <mat-card-header>
+        <mat-card-title>Emulator</mat-card-title>
+        <mat-card-subtitle>States</mat-card-subtitle>
+    </mat-card-header>
 
-<table class="mat-elevation-z2">
 
-    <tr>
-      <th> Emulator property </th>
-      <th> Value </th>
-    </tr>
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+        <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> Emulator State </th>
+            <td mat-cell *matCellDef="let element"> {{element.Name}} </td>
+        </ng-container>
 
-    <tr>
-        <td >Delay</td>
-        <td >{{state.Delay}}</td>
-    </tr>
+        <ng-container matColumnDef="value">
+            <th mat-header-cell *matHeaderCellDef> Value </th>
+            <td mat-cell *matCellDef="let element"> {{element.Value}} </td>
+        </ng-container>
 
-    <tr>
-        <td >Cycle Count</td>
-        <td >{{state.CycleCount}}</td>
-    </tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
 
-    <tr>
-        <td >Paused</td>
-        <td >{{state.PauseFlag}}</td>
-    </tr>
 
-    <tr>
-        <td >Debug</td>
-        <td >{{state.Debug}}</td>
-    </tr>
+    <mat-card-content>
+        <p>
 
-    <tr>
-        <td >Test</td>
-        <td >{{state.Test}}</td>
-    </tr>
+        </p>
+    </mat-card-content>
+</mat-card>
 
-    <tr>
-        <td >Break Address</td>
-        <td >{{state.BreakAddr}}</td>
-    </tr>
-</table>
+
 

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/santatamas/go-c64/CIA"
 	"github.com/santatamas/go-c64/MOS6510"
 	"github.com/santatamas/go-c64/RAM"
 	"github.com/santatamas/go-c64/VIC2"
@@ -39,8 +40,11 @@ type EmulatorState struct {
 func NewEmulator(testMode bool) Emulator {
 
 	memory := RAM.NewMemory(testMode)
-	display := VIC2.NewMemoryDisplay(&memory)
 	cpu := MOS6510.NewCPU(&memory)
+	cia := CIA.NewCIA(&cpu)
+	keyboard := CIA.NewKeyboard(&cia)
+	// TODO: use channels instead of a direct keyboard reference
+	display := VIC2.NewMemoryDisplay(&memory, &keyboard)
 
 	return Emulator{
 		CPU:        &cpu,

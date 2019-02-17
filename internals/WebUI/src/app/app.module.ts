@@ -14,6 +14,9 @@ import { CPUComponent } from './cpu/cpu.component';
 import { MemoryComponent } from './memory/memory.component';
 import { EmulatorComponent } from './emulator/emulator.component';
 import { MatTableModule } from '@angular/material/table';
+import { ControlsComponent } from './controls/controls.component';
+import {MatGridListModule} from '@angular/material/grid-list';
+import {MatCardModule} from '@angular/material/card';
 
 
 @NgModule({
@@ -22,7 +25,8 @@ import { MatTableModule } from '@angular/material/table';
     LogsComponent,
     CPUComponent,
     MemoryComponent,
-    EmulatorComponent
+    EmulatorComponent,
+    ControlsComponent
   ],
   imports: [
     BrowserModule,
@@ -31,7 +35,9 @@ import { MatTableModule } from '@angular/material/table';
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
-    MatTableModule
+    MatTableModule,
+    MatGridListModule,
+    MatCardModule
   ],
   providers: [WebsocketService, TelemetryService],
   bootstrap: [AppComponent]
