@@ -28,3 +28,7 @@ func GetHI(value uint16) byte {
 	binary.LittleEndian.PutUint16(bs, value)
 	return bs[1]
 }
+
+func GetBit(x byte, nr byte) bool {
+	return (x)&(1<<(nr)) == 1
+}

@@ -35,6 +35,9 @@ run-bin:
 	go build -o ./dist/main
 	./dist/main -prg-path=_resources/rom/64c.251913-01.bin
 
+start-web:
+	cd internals/WebUI; ng serve --open
+
 debug:
 	go build -o ./dist/main
 	./dist/main -debug=true

@@ -77,7 +77,7 @@ func (cpu *CPU) Interrupt() {
 
 	cpu.stackPush(n.GetLO(cpu.PC))
 	cpu.stackPush(n.GetHI(cpu.PC))
-	//cpu.stackPush(cpu.S) // TODO: clear B flag before pushing to stack
+	cpu.stackPush(cpu.S) // TODO: clear B flag before pushing to stack
 	cpu.PC = RAM.IRQ_VECTOR_ADDR
 }
 
