@@ -101,7 +101,8 @@ func (display *MemoryDisplay) Start() {
 			ev := s.PollEvent()
 			switch ev := ev.(type) {
 			case *tcell.EventKey:
-				display.keyboard.PressKey(ev.Key())
+				// Send keypress to keyboard --- use a generic channel instead!
+				display.keyboard.PressKey(ev)
 				switch ev.Key() {
 				case tcell.KeyEscape, tcell.KeyEnter:
 					close(quit)

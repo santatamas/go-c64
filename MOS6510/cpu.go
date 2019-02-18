@@ -1,13 +1,16 @@
 package MOS6510
 
 import (
+	"github.com/santatamas/go-c64/CIA"
 	"github.com/santatamas/go-c64/RAM"
+	n "github.com/santatamas/go-c64/numeric"
 	"log"
 	"reflect"
 )
 
 type CPU struct {
 	Memory     *RAM.Memory
+	Cia        *CIA.CIA
 	A          byte
 	Y          byte // low
 	X          byte // high
@@ -53,10 +56,11 @@ func (cpu *CPU) GetState() CPUState {
 	}
 }
 
-func NewCPU(mem *RAM.Memory) CPU {
+func NewCPU(mem *RAM.Memory, cia *CIA.CIA) CPU {
 
 	return CPU{
 		Memory:     mem,
+		Cia:        cia,
 		SP_LOW:     0x0100,
 		SP_HIGH:    0x01FF,
 		SP:         0xFF,
@@ -65,12 +69,26 @@ func NewCPU(mem *RAM.Memory) CPU {
 }
 
 func getTestCPU() (result CPU) {
-	memory := RAM.NewMemory(false)
-	return NewCPU(&memory)
+	memory := RAM.NewMemory(false, nil)
+	return NewCPU(&memory, nil)
+}
+
+func (cpu *CPU) Interrupt() {
+
+	cpu.stackPush(n.GetLO(cpu.PC))
+	cpu.stackPush(n.GetHI(cpu.PC))
+	//cpu.stackPush(cpu.S) // TODO: clear B flag before pushing to stack
+	cpu.PC = RAM.IRQ_VECTOR_ADDR
 }
 
 func (cpu *CPU) ExecuteCycle() bool {
 	log.Printf("Current PC address: %x \n", cpu.PC)
+
+	// TODO: this is not correct at all. temporary solution till I can solve circular dependency
+	if cpu.Cia.GetInterrupt() {
+		cpu.Interrupt()
+		//cpu.setStatusIRQ(false)
+	}
 
 	// Fetch first executable instruction code from memory
 	instrCode := cpu.Memory.ReadAbsolute(cpu.PC)

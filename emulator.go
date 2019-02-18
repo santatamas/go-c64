@@ -39,9 +39,9 @@ type EmulatorState struct {
 
 func NewEmulator(testMode bool) Emulator {
 
-	memory := RAM.NewMemory(testMode)
-	cpu := MOS6510.NewCPU(&memory)
-	cia := CIA.NewCIA(&cpu)
+	cia := CIA.NewCIA()
+	memory := RAM.NewMemory(testMode, &cia)
+	cpu := MOS6510.NewCPU(&memory, &cia)
 	keyboard := CIA.NewKeyboard(&cia)
 	// TODO: use channels instead of a direct keyboard reference
 	display := VIC2.NewMemoryDisplay(&memory, &keyboard)

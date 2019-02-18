@@ -2,6 +2,7 @@ package RAM
 
 import (
 	"fmt"
+	"github.com/santatamas/go-c64/CIA"
 	"io/ioutil"
 	"log"
 	"os"
@@ -9,6 +10,7 @@ import (
 
 type Memory struct {
 	memory []byte
+	cia    *CIA.CIA
 }
 
 const ROM_CHAR_ADDR = 0xD000
@@ -16,8 +18,12 @@ const ROM_KERNAL_ADDR = 0xE000
 const ROM_BASIC_ADDR = 0xA000
 const ROM_TEST_ADDR = 0x400
 
-func NewMemory(testMode bool) Memory {
-	mem := Memory{make([]byte, 65536)}
+const IRQ_VECTOR_ADDR = 0xFF48
+const CIA_PORT_A = 0xDC00
+const CIA_PORT_B = 0xDC01
+
+func NewMemory(testMode bool, cia *CIA.CIA) Memory {
+	mem := Memory{make([]byte, 65536), cia}
 
 	if testMode {
 		log.Println("[MEM] Loading TEST ROM...")
@@ -45,6 +51,9 @@ func (m *Memory) ReadZeroPage(zeroPageAddress byte) byte {
 }
 
 func (m *Memory) ReadAbsolute(absoluteAddress uint16) byte {
+	if absoluteAddress == CIA_PORT_B {
+		return m.cia.ReadRegister()
+	}
 	return m.memory[absoluteAddress]
 }
 
@@ -53,6 +62,9 @@ func (m *Memory) WriteZeroPage(zeroPageAddress byte, value byte) {
 }
 
 func (m *Memory) WriteAbsolute(absoluteAddress uint16, value byte) {
+	if absoluteAddress == CIA_PORT_A {
+		m.cia.WriteRegister(value)
+	}
 	m.memory[absoluteAddress] = value
 }
 

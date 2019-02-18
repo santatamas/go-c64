@@ -8,8 +8,11 @@ type Keyboard struct {
 	Cia *CIA
 }
 
-func (Keyboard *Keyboard) PressKey(key tcell.Key) {
+func (keyboard *Keyboard) PressKey(key *tcell.EventKey) {
 
+	if key.Rune() == 'a' {
+		keyboard.Cia.SetKey(0x1)
+	}
 }
 
 func NewKeyboard(cia *CIA) Keyboard {
