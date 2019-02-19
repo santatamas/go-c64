@@ -3,6 +3,7 @@ package CIA
 import (
 	"github.com/gdamore/tcell"
 	"log"
+	"strconv"
 )
 
 type Pair struct {
@@ -55,7 +56,7 @@ func keymap() func(rune) Pair {
 	}
 
 	return func(key rune) Pair {
-		log.Println("[Keyboard] Resolving rune " + string(key) + "to: " + string(innerMap[key].row) + "," + string(innerMap[key].col))
+		log.Println("[Keyboard] Resolving rune " + string(key) + " to: " + strconv.Itoa(int(innerMap[key].row)) + "," + strconv.Itoa(int(innerMap[key].col)))
 		return innerMap[key]
 	}
 }
@@ -66,7 +67,9 @@ type Keyboard struct {
 
 func (keyboard *Keyboard) PressKey(key *tcell.EventKey) {
 
-	keyMask := keymap()(key.Rune())
+	r := key.Rune()
+	log.Println("[Keyboard] PressKey called with rune:" + string(r))
+	keyMask := keymap()(r)
 	log.Println(string(keyMask.col)) // TODO: remove
 
 	keyboard.Cia.SetKey(keyMask.row, keyMask.col)
