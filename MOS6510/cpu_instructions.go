@@ -128,17 +128,27 @@ func (cpu *CPU) RTS(mode AddressingMode) {
 func (cpu *CPU) ADC(mode AddressingMode) {
 	log.Println("ADC called -- adr. mode: ", mode.String())
 
-	hi := cpu.getMemoryValue(mode)
+	mem := cpu.getMemoryValue(mode)
+	log.Println("ADC - memory value: ", mem)
+	log.Println("ADC - register A value: ", cpu.A)
 
-	result := cpu.A + hi
+	result := cpu.A + mem
+	log.Println("SBC - result: ", result)
+
+	memInt := int(mem)
+	cpuAInt := int(cpu.A)
+	intResult := cpuAInt + memInt
+	log.Println("SBC - intResult: ", intResult)
 
 	if cpu.getStatusCarry() {
 		result++
+		intResult++
 	}
 
-	cpu.setStatusCarry(uint16(cpu.A)+uint16(hi) > 255)
+	cpu.setStatusCarry(intResult > 255)
 
-	isOverflow := (((cpu.A ^ hi) & 0x80) == 0) && (((cpu.A ^ result) & 0x80) != 0)
+	isOverflow := (((cpu.A ^ mem) & 0x80) == 0) && (((cpu.A ^ result) & 0x80) != 0)
+	//                !((A ^ op) & 0x80)       &&      ((A ^ sum) & 0x80)
 	cpu.setStatusOverflow(isOverflow)
 	cpu.setStatusZero(result == 0)
 
@@ -933,21 +943,23 @@ func (cpu *CPU) SBC(mode AddressingMode) {
 	log.Println("SBC - register A value: ", cpu.A)
 
 	result := cpu.A - mem
+	log.Println("SBC - result: ", result)
 
 	memInt := int(mem)
 	cpuAInt := int(cpu.A)
 	intResult := cpuAInt - memInt
 	log.Println("SBC - intResult: ", intResult)
 
-	if cpu.getStatusCarry() {
+	if !cpu.getStatusCarry() {
 		result--
 		intResult--
 	}
 
-	cpu.setStatusCarry(intResult < 0)
-	log.Println("SBC - carry value: ", intResult < 0)
+	cpu.setStatusCarry(intResult >= 0)
+	log.Println("SBC - carry value: ", intResult >= 0)
 
 	isOverflow := (((cpu.A ^ result) & 0x80) != 0) && (((cpu.A ^ mem) & 0x80) != 0)
+	//  ((A ^ sum) & 0x80)          &&      ((A ^ op) & 0x80)
 	log.Println("SBC - isOverFlow: ", isOverflow)
 	cpu.setStatusOverflow(isOverflow)
 	cpu.setStatusZero(result == 0)
