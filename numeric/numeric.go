@@ -29,6 +29,10 @@ func GetHI(value uint16) byte {
 	return bs[1]
 }
 
+func IsNegative(value byte) bool {
+	return (value & (1 << 7)) == (1 << 7)
+}
+
 func GetBit(value byte, bitNumber byte) bool {
 	return (value & (1 << bitNumber)) == (1 << bitNumber)
 }

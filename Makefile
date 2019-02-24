@@ -42,6 +42,10 @@ debug:
 	go build -o ./dist/main
 	./dist/main -debug=true
 
+debug-test:
+	go build -o ./dist/main
+	./dist/main -debug=true -test=true
+
 tail:
 	tail -f log.txt
 

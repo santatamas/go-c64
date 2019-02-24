@@ -15,6 +15,12 @@ package MOS6510
  +-------------->  NEGATIVE      1=NEG
 */
 
+func (c *CPU) setStatusWithoutB(value byte) {
+	c.S = value
+	c.setStatusBRK(true)
+	c.S |= 0x20
+}
+
 func (c *CPU) setStatusCarry(flag bool) {
 	if flag {
 		c.S |= 0x01

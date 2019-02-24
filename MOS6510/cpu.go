@@ -64,6 +64,7 @@ func NewCPU(mem *RAM.Memory, cia *CIA.CIA) CPU {
 		SP_LOW:     0x0100,
 		SP_HIGH:    0x01FF,
 		SP:         0xFF,
+		S:          0x30,
 		instrTypes: assemblyInstructions(),
 	}
 }
@@ -74,11 +75,16 @@ func getTestCPU() (result CPU) {
 }
 
 func (cpu *CPU) Interrupt() {
-
 	cpu.stackPush(n.GetLO(cpu.PC))
 	cpu.stackPush(n.GetHI(cpu.PC))
 	cpu.stackPush(cpu.S) // TODO: clear B flag before pushing to stack
-	cpu.PC = RAM.IRQ_VECTOR_ADDR
+
+	lo := cpu.Memory.ReadAbsolute(RAM.IRQ_VECTOR_ADDR_LO)
+	hi := cpu.Memory.ReadAbsolute(RAM.IRQ_VECTOR_ADDR_HI)
+
+	cpu.PC = n.ToInt16([]byte{lo, hi})
+	cpu.setStatusIRQ(true)
+	cpu.setStatusBRK(true)
 }
 
 func (cpu *CPU) ExecuteCycle() bool {
@@ -100,7 +106,7 @@ func (cpu *CPU) ExecuteCycle() bool {
 	instruction := cpu.instrTypes(instrCode)
 
 	cpu.callMethod(instruction)
-	return instruction.Type != BRK
+	return true //instruction.Type != BRK
 }
 
 // slow
@@ -219,6 +225,12 @@ func (cpu *CPU) callMethod(instruction AssemblyInstruction) {
 		cpu.DEC(instruction.AddressingMode)
 	case LSR:
 		cpu.LSR(instruction.AddressingMode)
+	case RTI:
+		cpu.RTI(instruction.AddressingMode)
+	case SED:
+		cpu.SED(instruction.AddressingMode)
+	case CLV:
+		cpu.CLV(instruction.AddressingMode)
 	default:
 		log.Println("[WARNING] Unimplemented instruction! ", instruction.Type.String())
 	}

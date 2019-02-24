@@ -53,7 +53,7 @@ func (cia *CIA) ReadRegister() byte {
 	}
 
 	// invert bits
-	//result ^= 0xF
+	result ^= 0xFF
 
 	log.Println("[CIA] Returning read register:" + strconv.FormatInt(int64(result), 2))
 	return result
