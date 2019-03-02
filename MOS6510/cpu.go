@@ -75,8 +75,12 @@ func getTestCPU() (result CPU) {
 }
 
 func (cpu *CPU) Interrupt() {
-	cpu.stackPush(n.GetLO(cpu.PC))
-	cpu.stackPush(n.GetHI(cpu.PC))
+	log.Println("Interrupt called")
+	cpu.stackPush(n.GetHI(cpu.PC + 1))
+	cpu.stackPush(n.GetLO(cpu.PC + 1))
+
+	cpu.setStatusBRK(false)
+
 	cpu.stackPush(cpu.S) // TODO: clear B flag before pushing to stack
 
 	lo := cpu.Memory.ReadAbsolute(RAM.IRQ_VECTOR_ADDR_LO)

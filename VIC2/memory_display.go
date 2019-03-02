@@ -68,6 +68,9 @@ func (display *MemoryDisplay) DrawState(screen tcell.Screen) {
 			char := display.c64Characters(display.memory.ReadAbsolute(currentAdr))
 
 			st = st.Foreground(getColor(color))
+			if char == ' ' {
+				//st = st.Background(getColor(color))
+			}
 			screen.SetCell(x+1, y+1, st, char)
 			currentAdr++
 			currentColorAdr++
