@@ -22,7 +22,7 @@ type Emulator struct {
 	CIA        *CIA.CIA
 	Display    *VIC2.MemoryDisplay
 	Delay      time.Duration
-	cycleCount int64
+	cycleCount uint64
 	pauseFlag  bool
 	Debug      bool
 	Test       bool
@@ -32,7 +32,7 @@ type Emulator struct {
 
 type EmulatorState struct {
 	Delay      time.Duration
-	CycleCount int64
+	CycleCount uint64
 	PauseFlag  bool
 	Debug      bool
 	Test       bool
@@ -92,7 +92,7 @@ func (emu *Emulator) Start() {
 			}
 
 			if !emu.pauseFlag {
-				emu.CIA.ExecuteCycle()
+				emu.CIA.ExecuteCycle(emu.cycleCount)
 				result := emu.CPU.ExecuteCycle()
 				if !result {
 					break

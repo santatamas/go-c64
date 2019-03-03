@@ -28,12 +28,14 @@ type CIA struct {
 	//Complex Interface Adapter (CIA) #1 Registers
 	IrqChannel          chan bool
 	Interrupt           bool
-	Previous_cpu_cycles uint32
+	Previous_cpu_cycles uint64
 	TIMER_A             uint16
+	TIMER_A_INPUT       byte
 	TIMER_A_ENABLED     bool
 	TIMER_A_LATCH       uint16
 	TIMER_A_IRQ         bool
 	TIMER_B             uint16
+	TIMER_B_INPUT       byte
 	TIMER_B_ENABLED     bool
 	TIMER_B_LATCH       uint16
 	TIMER_B_IRQ         bool
@@ -55,8 +57,34 @@ func NewCIA(irqChannel chan bool) CIA {
 	}
 }
 
-func (cia *CIA) ExecuteCycle() {
+func (cia *CIA) ExecuteCycle(currentCpuCycleCount uint64) {
 	// TODO: implement cycle
+
+	if cia.TIMER_A_ENABLED {
+		cia.TIMER_A -= uint16(currentCpuCycleCount - cia.Previous_cpu_cycles)
+		if cia.TIMER_A <= 0 {
+			if cia.TIMER_A_IRQ {
+				//timer_a_irq_triggered_ = true;
+				cia.IrqChannel <- true
+			}
+			cia.TIMER_A = cia.TIMER_A_LATCH
+			//reset_timer_a();
+		}
+	}
+
+	if cia.TIMER_B_ENABLED {
+		cia.TIMER_B -= uint16(currentCpuCycleCount - cia.Previous_cpu_cycles)
+		if cia.TIMER_B <= 0 {
+			if cia.TIMER_B_IRQ {
+				//timer_B_irq_triggered_ = true;
+				cia.IrqChannel <- true
+			}
+			cia.TIMER_B = cia.TIMER_B_LATCH
+			//reset_timer_B();
+		}
+	}
+
+	cia.Previous_cpu_cycles = currentCpuCycleCount
 }
 
 func (cia *CIA) SetKey(row byte, col byte) {
@@ -64,10 +92,18 @@ func (cia *CIA) SetKey(row byte, col byte) {
 	cia.Keyboard_matrix[row] |= (1 << col)
 
 	go func() {
-		cia.IrqChannel <- true
+		//cia.IrqChannel <- true
 	}()
 
 	log.Printf("[CIA] SetKey called with row " + strconv.Itoa(int(row)) + " and col " + strconv.Itoa(int(col)))
+	log.Println("[CIA] Keyboard matrix current row:" + strconv.FormatInt(int64(cia.Keyboard_matrix[row]), 2))
+}
+
+func (cia *CIA) UnsetKey(row byte, col byte) {
+	log.Printf("Unsetkey called")
+	cia.Keyboard_matrix[row] &= (0 << col)
+
+	log.Printf("[CIA] UnsetKey called with row " + strconv.Itoa(int(row)) + " and col " + strconv.Itoa(int(col)))
 	log.Println("[CIA] Keyboard matrix current row:" + strconv.FormatInt(int64(cia.Keyboard_matrix[row]), 2))
 }
 
@@ -107,67 +143,51 @@ func (cia *CIA) Read(address uint16) byte {
 }
 
 func (cia *CIA) Write(address uint16, data byte) {
-	if address == CIA_PORT_A {
+
+	switch address {
+	case CIA_PORT_A:
 		cia.PORT_A = data
-	}
-
-	/*
-		case 0x0:
-		  pra_ = v;
-		  break;
-
-		case 0x1:
-		  break;
-
-		case 0x2:
-		  break;
-
-		case 0x3:
-		  break;
-
-		case 0x4:
-		  timer_a_latch_ &= 0xff00;
-		  timer_a_latch_ |= v;
-		  break;
-
-		case 0x5:
-		  timer_a_latch_ &= 0x00ff;
-		  timer_a_latch_ |= v << 8;
-		  break;
-
-		case 0x6:
-		  timer_b_latch_ &= 0xff00;
-		  timer_b_latch_ |= v;
-		  break;
-
-		case 0x7:
-		  timer_b_latch_ &= 0x00ff;
-		  timer_b_latch_ |= v << 8;
-		  break;
-
-		case 0xd:
-		  if(ISSET_BIT(v,0)) timer_a_irq_enabled_ = ISSET_BIT(v,7);
-		  if(ISSET_BIT(v,1)) timer_b_irq_enabled_ = ISSET_BIT(v,7);
-		  break;
-
-		case 0xe:
-		  timer_a_enabled_ = ((v&(1<<0))!=0);
-		  timer_a_input_mode_ = (v&(1<<5)) >> 5;
-		  // load latch requested
-		  if((v&(1<<4))!=0)
-			timer_a_counter_ = timer_a_latch_;
-		  break;
-
-		case 0xf:
-		  timer_b_enabled_ = ((v&0x1)!=0);
-		  timer_b_input_mode_ = (v&(1<<5)) | (v&(1<<6)) >> 5;
-		  // load latch requested
-		  if((v&(1<<4))!=0)
-			timer_b_counter_ = timer_b_latch_;
-		  break;
+		break
+	case CIA_TA_LO:
+		cia.TIMER_A_LATCH &= 0xff00
+		cia.TIMER_A_LATCH |= uint16(data)
+		break
+	case CIA_TA_HI:
+		cia.TIMER_A_LATCH &= 0x00ff
+		cia.TIMER_A_LATCH |= uint16(data << 8)
+		break
+	case CIA_TB_LO:
+		cia.TIMER_B_LATCH &= 0xff00
+		cia.TIMER_B_LATCH |= uint16(data)
+		break
+	case CIA_TB_HI:
+		cia.TIMER_B_LATCH &= 0x00ff
+		cia.TIMER_B_LATCH |= uint16(data << 8)
+		break
+	case CIA_ICR:
+		if n.GetBit(data, 0) {
+			cia.TIMER_A_IRQ = n.GetBit(data, 7)
 		}
-	  }*/
 
+		if n.GetBit(data, 1) {
+			cia.TIMER_B_IRQ = n.GetBit(data, 7)
+		}
+		break
+	case CIA_CRA:
+		cia.TIMER_A_ENABLED = ((data & (1 << 0)) != 0)
+		cia.TIMER_A_INPUT = (data & (1 << 5)) >> 5
+		if (data & (1 << 4)) != 0 {
+			cia.TIMER_A = cia.TIMER_A_LATCH
+		}
+		break
+	case CIA_CRB:
+		cia.TIMER_B_ENABLED = ((data & 0x1) != 0)
+		cia.TIMER_B_INPUT = (data & (1 << 5)) | (data&(1<<6))>>5
+		if (data & (1 << 4)) != 0 {
+			cia.TIMER_B = cia.TIMER_B_LATCH
+		}
+		break
+	}
 }
 
 func (cia *CIA) ReadRegister() byte {

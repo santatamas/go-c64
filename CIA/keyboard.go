@@ -4,6 +4,7 @@ import (
 	"github.com/gdamore/tcell"
 	"log"
 	"strconv"
+	//"time"
 )
 
 type Pair struct {
@@ -72,6 +73,11 @@ func (keyboard *Keyboard) PressKey(key *tcell.EventKey) {
 	keyMask := keymap()(r)
 
 	keyboard.Cia.SetKey(keyMask.row, keyMask.col)
+
+	/*go func() {
+		time.Sleep(300)
+		keyboard.Cia.UnsetKey(keyMask.row, keyMask.col)
+	}()*/
 }
 
 func NewKeyboard(cia *CIA) Keyboard {

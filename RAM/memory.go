@@ -24,9 +24,6 @@ const IRQ_VECTOR_ADDR_HI = 0xFFFF
 const CIA_ADDR_RANGE_LO = 0xDC00
 const CIA_ADDR_RANGE_HI = 0xDC0F
 
-const CIA_PORT_A = 0xDC00 // data port A (write register)
-const CIA_PORT_B = 0xDC01 // data port B (read register)
-
 func NewMemory(testMode bool, cia *CIA.CIA) Memory {
 	mem := Memory{make([]byte, 65536), cia}
 
@@ -56,7 +53,7 @@ func (m *Memory) ReadZeroPage(zeroPageAddress byte) byte {
 }
 
 func (m *Memory) ReadAbsolute(absoluteAddress uint16) byte {
-	if absoluteAddress >= CIA_PORT_A && absoluteAddress <= CIA_PORT_B {
+	if absoluteAddress >= CIA_ADDR_RANGE_LO && absoluteAddress <= CIA_ADDR_RANGE_HI {
 		return m.cia.Read(absoluteAddress)
 	}
 	return m.memory[absoluteAddress]
@@ -67,7 +64,7 @@ func (m *Memory) WriteZeroPage(zeroPageAddress byte, value byte) {
 }
 
 func (m *Memory) WriteAbsolute(absoluteAddress uint16, value byte) {
-	if absoluteAddress >= CIA_PORT_A && absoluteAddress <= CIA_PORT_B {
+	if absoluteAddress >= CIA_ADDR_RANGE_LO && absoluteAddress <= CIA_ADDR_RANGE_HI {
 		m.cia.Write(absoluteAddress, value)
 	}
 	m.memory[absoluteAddress] = value
