@@ -70,7 +70,6 @@ func (keyboard *Keyboard) PressKey(key *tcell.EventKey) {
 	r := key.Rune()
 	log.Println("[Keyboard] PressKey called with rune:" + string(r))
 	keyMask := keymap()(r)
-	log.Println(string(keyMask.col)) // TODO: remove
 
 	keyboard.Cia.SetKey(keyMask.row, keyMask.col)
 }

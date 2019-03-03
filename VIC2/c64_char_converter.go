@@ -1,7 +1,7 @@
 package VIC2
 
 import (
-	"log"
+	//"log"
 	"strconv"
 	"strings"
 )
@@ -166,8 +166,8 @@ func asciiCharacters() func(byte) rune {
 		/*if key == 129 {
 			return '∀'
 		}*/
-		log.Println("Resolving character by bytecode: ", value)
-		log.Println("Resolved char: ", innerMap[value])
+		//log.Println("Resolving character by bytecode: ", value)
+		//log.Println("Resolved char: ", innerMap[value])
 		return innerMap[value]
 	}
 }

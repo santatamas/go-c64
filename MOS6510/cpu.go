@@ -1,7 +1,6 @@
 package MOS6510
 
 import (
-	"github.com/santatamas/go-c64/CIA"
 	"github.com/santatamas/go-c64/RAM"
 	n "github.com/santatamas/go-c64/numeric"
 	"log"
@@ -9,18 +8,18 @@ import (
 )
 
 type CPU struct {
-	Memory     *RAM.Memory
-	Cia        *CIA.CIA
-	A          byte
-	Y          byte // low
-	X          byte // high
-	S          byte
-	P          byte
-	PC         uint16
-	SP         byte
-	SP_LOW     uint16
-	SP_HIGH    uint16
-	instrTypes func(byte) AssemblyInstruction
+	Memory        *RAM.Memory
+	A             byte
+	Y             byte // low
+	X             byte // high
+	S             byte
+	P             byte
+	PC            uint16
+	SP            byte
+	SP_LOW        uint16
+	SP_HIGH       uint16
+	instrTypes    func(byte) AssemblyInstruction
+	InterruptFlag bool
 }
 
 type CPUState struct {
@@ -56,11 +55,10 @@ func (cpu *CPU) GetState() CPUState {
 	}
 }
 
-func NewCPU(mem *RAM.Memory, cia *CIA.CIA) CPU {
+func NewCPU(mem *RAM.Memory) CPU {
 
 	return CPU{
 		Memory:     mem,
-		Cia:        cia,
 		SP_LOW:     0x0100,
 		SP_HIGH:    0x01FF,
 		SP:         0xFF,
@@ -71,7 +69,7 @@ func NewCPU(mem *RAM.Memory, cia *CIA.CIA) CPU {
 
 func getTestCPU() (result CPU) {
 	memory := RAM.NewMemory(false, nil)
-	return NewCPU(&memory, nil)
+	return NewCPU(&memory)
 }
 
 func (cpu *CPU) Interrupt() {
@@ -95,9 +93,9 @@ func (cpu *CPU) ExecuteCycle() bool {
 	log.Printf("Current PC address: %x \n", cpu.PC)
 
 	// TODO: this is not correct at all. temporary solution till I can solve circular dependency
-	if cpu.Cia.GetInterrupt() {
+	if cpu.InterruptFlag {
 		cpu.Interrupt()
-		//cpu.setStatusIRQ(false)
+		cpu.InterruptFlag = false
 	}
 
 	// Fetch first executable instruction code from memory

@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/gdamore/tcell"
 	"github.com/santatamas/go-c64/CIA"
 	"github.com/santatamas/go-c64/MOS6510"
 	"github.com/santatamas/go-c64/RAM"
@@ -18,6 +19,7 @@ import (
 
 type Emulator struct {
 	CPU        *MOS6510.CPU
+	CIA        *CIA.CIA
 	Display    *VIC2.MemoryDisplay
 	Delay      time.Duration
 	cycleCount int64
@@ -39,15 +41,35 @@ type EmulatorState struct {
 
 func NewEmulator(testMode bool) Emulator {
 
-	cia := CIA.NewCIA()
+	keyPressChannel := make(chan *tcell.EventKey)
+	irqChannel := make(chan bool)
+
+	cia := CIA.NewCIA(irqChannel)
 	memory := RAM.NewMemory(testMode, &cia)
-	cpu := MOS6510.NewCPU(&memory, &cia)
+	cpu := MOS6510.NewCPU(&memory)
 	keyboard := CIA.NewKeyboard(&cia)
-	// TODO: use channels instead of a direct keyboard reference
-	display := VIC2.NewMemoryDisplay(&memory, &keyboard)
+	display := VIC2.NewMemoryDisplay(&memory, keyPressChannel)
+
+	// Handle async events, like keypresses from terminal, and IRQ events (CIA->CPU)
+	go func() {
+		for {
+			select {
+			case key := <-keyPressChannel:
+				log.Print("presskey channel new message")
+				keyboard.PressKey(key)
+			case irq := <-irqChannel:
+				log.Print("irq channel new message")
+				cpu.SetIRQ(irq)
+			}
+
+			//log.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+			//time.Sleep(100)
+		}
+	}()
 
 	return Emulator{
 		CPU:        &cpu,
+		CIA:        &cia,
 		Delay:      0,
 		Display:    &display,
 		cycleCount: 0,
@@ -73,6 +95,7 @@ func (emu *Emulator) Start() {
 			}
 
 			if !emu.pauseFlag {
+				emu.CIA.ExecuteCycle()
 				result := emu.CPU.ExecuteCycle()
 				if !result {
 					break

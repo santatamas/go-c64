@@ -3,17 +3,15 @@ package VIC2
 import (
 	"fmt"
 	"github.com/gdamore/tcell"
-	"github.com/santatamas/go-c64/CIA"
 	"github.com/santatamas/go-c64/RAM"
-	//"log"
 	"os"
 	"time"
 )
 
 type MemoryDisplay struct {
 	memory        *RAM.Memory
-	keyboard      *CIA.Keyboard // TODO: use a channel, instead of a direct reference
 	c64Characters func(byte) rune
+	keyPress      chan *tcell.EventKey
 }
 
 const SCREEN_START_ADDR = uint16(0x400)
@@ -26,8 +24,8 @@ const RASTER_REGISTER_ADDR = 0xD012
 const TEXT_SCREEN_WIDTH = 40
 const TEXT_SCREEN_HEIGHT = 25
 
-func NewMemoryDisplay(memory *RAM.Memory, keyboard *CIA.Keyboard) MemoryDisplay {
-	result := MemoryDisplay{memory, keyboard, asciiCharacters()}
+func NewMemoryDisplay(memory *RAM.Memory, keyPress chan *tcell.EventKey) MemoryDisplay {
+	result := MemoryDisplay{memory, asciiCharacters(), keyPress}
 	return result
 }
 
@@ -104,8 +102,6 @@ func (display *MemoryDisplay) Start() {
 			ev := s.PollEvent()
 			switch ev := ev.(type) {
 			case *tcell.EventKey:
-				// Send keypress to keyboard --- use a generic channel instead!
-				display.keyboard.PressKey(ev)
 				switch ev.Key() {
 				case tcell.KeyEscape, tcell.KeyEnter:
 					close(quit)
@@ -113,6 +109,9 @@ func (display *MemoryDisplay) Start() {
 				case tcell.KeyCtrlL:
 					s.Sync()
 				}
+
+				display.keyPress <- ev
+
 			case *tcell.EventResize:
 				s.Sync()
 			}

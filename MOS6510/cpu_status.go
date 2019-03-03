@@ -45,6 +45,10 @@ func (c *CPU) getStatusZero() bool {
 	return c.S&0x02 == 0x02
 }
 
+func (c *CPU) SetIRQ(flag bool) {
+	c.InterruptFlag = true
+}
+
 func (c *CPU) setStatusIRQ(flag bool) {
 	if flag {
 		c.S |= 0x04
