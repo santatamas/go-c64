@@ -20,7 +20,9 @@ export class EmulatorComponent implements OnInit {
       const telemetry: Telemetry = JSON.parse(t);
 
       if (telemetry.Command === 'GetEmulatorState') {
-        this.dataSource = helper.convertToTableRows(JSON.parse(atob(telemetry.Payload)));
+        const emuState: EmulatorState = JSON.parse(atob(telemetry.Payload));
+        emuState.CycleCount += ' '; // HACK: force this variable to be a string to avoid hex conversion
+        this.dataSource = helper.convertToTableRows(emuState);
       }
     });
    }

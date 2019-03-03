@@ -1,6 +1,6 @@
 export class EmulatorState {
-    Delay: number;
-    CycleCount: number;
+    Delay: string;
+    CycleCount: string;
     PauseFlag: boolean;
     Debug: boolean;
     Test: boolean;

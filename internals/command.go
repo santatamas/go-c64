@@ -16,6 +16,7 @@ const (
 	ExecuteNext
 	GetCPUState
 	GetEmulatorState
+	GetCIAState
 	GetMemoryContent
 	SetBreakpoint
 )
@@ -31,6 +32,7 @@ var toString = map[Command]string{
 	ExecuteNext:      "ExecuteNext",
 	GetCPUState:      "GetCPUState",
 	GetEmulatorState: "GetEmulatorState",
+	GetCIAState:      "GetCIAState",
 	GetMemoryContent: "GetMemoryContent",
 	SetBreakpoint:    "SetBreakpoint",
 }
@@ -42,6 +44,7 @@ var toID = map[string]Command{
 	"ExecuteNext":      ExecuteNext,
 	"GetCPUState":      GetCPUState,
 	"GetEmulatorState": GetEmulatorState,
+	"GetCIAState":      GetCIAState,
 	"GetMemoryContent": GetMemoryContent,
 	"SetBreakpoint":    SetBreakpoint,
 }

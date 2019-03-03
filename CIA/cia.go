@@ -26,21 +26,23 @@ const CIA_CRB = 0xDC0F       // Control Timer B
 type CIA struct {
 	//56320-56335   $DC00-$DC0F
 	//Complex Interface Adapter (CIA) #1 Registers
-	IrqChannel          chan bool
-	Interrupt           bool
-	Previous_cpu_cycles uint64
-	TIMER_A             uint16
-	TIMER_A_INPUT       byte
-	TIMER_A_ENABLED     bool
-	TIMER_A_LATCH       uint16
-	TIMER_A_IRQ         bool
-	TIMER_B             uint16
-	TIMER_B_INPUT       byte
-	TIMER_B_ENABLED     bool
-	TIMER_B_LATCH       uint16
-	TIMER_B_IRQ         bool
-	PORT_A              byte
-	Keyboard_matrix     []byte
+	IrqChannel            chan bool
+	Interrupt             bool
+	Previous_cpu_cycles   uint64
+	TIMER_A               uint16
+	TIMER_A_INPUT         byte
+	TIMER_A_ENABLED       bool
+	TIMER_A_LATCH         uint16
+	TIMER_A_IRQ           bool
+	TIMER_A_IRQ_TRIGGERED bool
+	TIMER_B               uint16
+	TIMER_B_INPUT         byte
+	TIMER_B_ENABLED       bool
+	TIMER_B_LATCH         uint16
+	TIMER_B_IRQ           bool
+	TIMER_B_IRQ_TRIGGERED bool
+	PORT_A                byte
+	Keyboard_matrix       []byte
 }
 
 func NewCIA(irqChannel chan bool) CIA {
@@ -50,20 +52,22 @@ func NewCIA(irqChannel chan bool) CIA {
 		Interrupt:       false,
 		PORT_A:          0x0,
 		TIMER_A:         0x0,
+		TIMER_A_ENABLED: false,
 		TIMER_A_IRQ:     false,
 		TIMER_B:         0x0,
+		TIMER_B_ENABLED: false,
 		TIMER_B_IRQ:     false,
 		Keyboard_matrix: make([]byte, 8),
 	}
 }
 
 func (cia *CIA) ExecuteCycle(currentCpuCycleCount uint64) {
-	// TODO: implement cycle
 
 	if cia.TIMER_A_ENABLED {
 		cia.TIMER_A -= uint16(currentCpuCycleCount - cia.Previous_cpu_cycles)
 		if cia.TIMER_A <= 0 {
 			if cia.TIMER_A_IRQ {
+				cia.TIMER_A_IRQ_TRIGGERED = true
 				//timer_a_irq_triggered_ = true;
 				cia.IrqChannel <- true
 			}
@@ -76,6 +80,7 @@ func (cia *CIA) ExecuteCycle(currentCpuCycleCount uint64) {
 		cia.TIMER_B -= uint16(currentCpuCycleCount - cia.Previous_cpu_cycles)
 		if cia.TIMER_B <= 0 {
 			if cia.TIMER_B_IRQ {
+				cia.TIMER_B_IRQ_TRIGGERED = true
 				//timer_B_irq_triggered_ = true;
 				cia.IrqChannel <- true
 			}
@@ -127,12 +132,12 @@ func (cia *CIA) Read(address uint16) byte {
 		result = byte((cia.TIMER_B & 0xff00) >> 8)
 		break
 	case CIA_ICR:
-		if cia.TIMER_A_IRQ || cia.TIMER_B_IRQ {
+		if cia.TIMER_A_IRQ_TRIGGERED || cia.TIMER_B_IRQ_TRIGGERED {
 			result |= (1 << 7) // IRQ occured
-			if cia.TIMER_A_IRQ {
+			if cia.TIMER_A_IRQ_TRIGGERED {
 				result |= (1 << 0)
 			}
-			if cia.TIMER_B_IRQ {
+			if cia.TIMER_B_IRQ_TRIGGERED {
 				result |= (1 << 1)
 			}
 		}

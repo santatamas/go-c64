@@ -17,6 +17,7 @@ import { MatTableModule } from '@angular/material/table';
 import { ControlsComponent } from './controls/controls.component';
 import {MatGridListModule} from '@angular/material/grid-list';
 import {MatCardModule} from '@angular/material/card';
+import { CiaComponent } from './cia/cia.component';
 
 
 @NgModule({
@@ -26,7 +27,8 @@ import {MatCardModule} from '@angular/material/card';
     CPUComponent,
     MemoryComponent,
     EmulatorComponent,
-    ControlsComponent
+    ControlsComponent,
+    CiaComponent
   ],
   imports: [
     BrowserModule,

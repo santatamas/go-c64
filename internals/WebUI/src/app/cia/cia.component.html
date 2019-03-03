@@ -1,0 +1,27 @@
+<mat-card class="example-card">
+  <mat-card-header>
+      <mat-card-title>CIA</mat-card-title>
+      <mat-card-subtitle>Chip states</mat-card-subtitle>
+  </mat-card-header>
+
+  <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
+      <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef> CIA Property </th>
+          <td mat-cell *matCellDef="let element"> {{element.Name}} </td>
+      </ng-container>
+
+      <ng-container matColumnDef="value">
+          <th mat-header-cell *matHeaderCellDef> Value </th>
+          <td mat-cell *matCellDef="let element"> {{element.Value}} </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+
+  <mat-card-content>
+      <p>
+
+      </p>
+  </mat-card-content>
+</mat-card>

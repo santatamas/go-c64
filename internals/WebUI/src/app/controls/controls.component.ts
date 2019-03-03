@@ -64,6 +64,11 @@ export class ControlsComponent implements OnInit {
     this.telemetryService.sendStringCommand('GetCPUState');
   }
 
+  getCIAState() {
+    console.log('get CIA state called');
+    this.telemetryService.sendStringCommand('GetCIAState');
+  }
+
   getEmulatorState() {
     console.log('get Emulator state called');
     this.telemetryService.sendStringCommand('GetEmulatorState');
@@ -80,12 +85,16 @@ export class ControlsComponent implements OnInit {
     }, 50);
 
     setTimeout(() => {
+      this.telemetryService.sendStringCommand('GetCIAState');
+    }, 75);
+
+    setTimeout(() => {
       this.telemetryService.sendStringCommand('GetEmulatorState');
     }, 100);
 
     setTimeout(() => {
       this.telemetryService.sendStringCommand('GetMemoryContent');
-    }, 150);
+    }, 125);
   }
 
 }
