@@ -79,7 +79,7 @@ func (cpu *CPU) Interrupt() {
 
 	cpu.setStatusBRK(false)
 
-	cpu.stackPush(cpu.S) // TODO: clear B flag before pushing to stack
+	cpu.stackPush(cpu.S)
 
 	lo := cpu.Memory.ReadAbsolute(RAM.IRQ_VECTOR_ADDR_LO)
 	hi := cpu.Memory.ReadAbsolute(RAM.IRQ_VECTOR_ADDR_HI)
@@ -92,7 +92,6 @@ func (cpu *CPU) Interrupt() {
 func (cpu *CPU) ExecuteCycle() bool {
 	log.Printf("Current PC address: %x \n", cpu.PC)
 
-	// TODO: this is not correct at all. temporary solution till I can solve circular dependency
 	if cpu.InterruptFlag {
 		cpu.Interrupt()
 		cpu.InterruptFlag = false

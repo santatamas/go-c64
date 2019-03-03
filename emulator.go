@@ -61,9 +61,6 @@ func NewEmulator(testMode bool) Emulator {
 				log.Print("irq channel new message")
 				cpu.SetIRQ(irq)
 			}
-
-			//log.Println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-			//time.Sleep(100)
 		}
 	}()
 

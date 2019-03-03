@@ -110,6 +110,64 @@ func (cia *CIA) Write(address uint16, data byte) {
 	if address == CIA_PORT_A {
 		cia.PORT_A = data
 	}
+
+	/*
+		case 0x0:
+		  pra_ = v;
+		  break;
+
+		case 0x1:
+		  break;
+
+		case 0x2:
+		  break;
+
+		case 0x3:
+		  break;
+
+		case 0x4:
+		  timer_a_latch_ &= 0xff00;
+		  timer_a_latch_ |= v;
+		  break;
+
+		case 0x5:
+		  timer_a_latch_ &= 0x00ff;
+		  timer_a_latch_ |= v << 8;
+		  break;
+
+		case 0x6:
+		  timer_b_latch_ &= 0xff00;
+		  timer_b_latch_ |= v;
+		  break;
+
+		case 0x7:
+		  timer_b_latch_ &= 0x00ff;
+		  timer_b_latch_ |= v << 8;
+		  break;
+
+		case 0xd:
+		  if(ISSET_BIT(v,0)) timer_a_irq_enabled_ = ISSET_BIT(v,7);
+		  if(ISSET_BIT(v,1)) timer_b_irq_enabled_ = ISSET_BIT(v,7);
+		  break;
+
+		case 0xe:
+		  timer_a_enabled_ = ((v&(1<<0))!=0);
+		  timer_a_input_mode_ = (v&(1<<5)) >> 5;
+		  // load latch requested
+		  if((v&(1<<4))!=0)
+			timer_a_counter_ = timer_a_latch_;
+		  break;
+
+		case 0xf:
+		  timer_b_enabled_ = ((v&0x1)!=0);
+		  timer_b_input_mode_ = (v&(1<<5)) | (v&(1<<6)) >> 5;
+		  // load latch requested
+		  if((v&(1<<4))!=0)
+			timer_b_counter_ = timer_b_latch_;
+		  break;
+		}
+	  }*/
+
 }
 
 func (cia *CIA) ReadRegister() byte {
