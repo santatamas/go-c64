@@ -67,6 +67,7 @@ func (cia *CIA) ExecuteCycle(currentCpuCycleCount uint64) {
 		cia.TIMER_A -= uint16(currentCpuCycleCount - cia.Previous_cpu_cycles)
 		if cia.TIMER_A <= 0 {
 			if cia.TIMER_A_IRQ {
+				log.Printf("[CIA] Timer A - Triggering IRQ")
 				cia.TIMER_A_IRQ_TRIGGERED = true
 				//timer_a_irq_triggered_ = true;
 				cia.IrqChannel <- true
@@ -80,6 +81,7 @@ func (cia *CIA) ExecuteCycle(currentCpuCycleCount uint64) {
 		cia.TIMER_B -= uint16(currentCpuCycleCount - cia.Previous_cpu_cycles)
 		if cia.TIMER_B <= 0 {
 			if cia.TIMER_B_IRQ {
+				log.Printf("[CIA] Timer B - Triggering IRQ")
 				cia.TIMER_B_IRQ_TRIGGERED = true
 				//timer_B_irq_triggered_ = true;
 				cia.IrqChannel <- true
@@ -93,12 +95,12 @@ func (cia *CIA) ExecuteCycle(currentCpuCycleCount uint64) {
 }
 
 func (cia *CIA) SetKey(row byte, col byte) {
-	log.Printf("Setkey called")
+	log.Printf("[CIA] Setkey called")
 	cia.Keyboard_matrix[row] |= (1 << col)
 
-	go func() {
-		//cia.IrqChannel <- true
-	}()
+	//go func() {
+	//cia.IrqChannel <- true
+	//}()
 
 	log.Printf("[CIA] SetKey called with row " + strconv.Itoa(int(row)) + " and col " + strconv.Itoa(int(col)))
 	log.Println("[CIA] Keyboard matrix current row:" + strconv.FormatInt(int64(cia.Keyboard_matrix[row]), 2))
@@ -115,23 +117,31 @@ func (cia *CIA) UnsetKey(row byte, col byte) {
 func (cia *CIA) Read(address uint16) byte {
 	result := byte(0x0)
 
+	log.Printf("[CIA] Read called with memory address %x", address)
+
 	switch address {
 	case CIA_PORT_B:
+		log.Printf("[CIA] Read CIA_PORT_B")
 		result = cia.ReadRegister()
 		break
 	case CIA_TA_LO:
+		log.Printf("[CIA] Read CIA_TA_LO")
 		result = byte(cia.TIMER_A & 0x00ff)
 		break
 	case CIA_TA_HI:
+		log.Printf("[CIA] Read CIA_TA_HI")
 		result = byte((cia.TIMER_A & 0xff00) >> 8)
 		break
 	case CIA_TB_LO:
+		log.Printf("[CIA] Read CIA_TB_LO")
 		result = byte(cia.TIMER_B & 0x00ff)
 		break
 	case CIA_TB_HI:
+		log.Printf("[CIA] Read CIA_TB_HI")
 		result = byte((cia.TIMER_B & 0xff00) >> 8)
 		break
 	case CIA_ICR:
+		log.Printf("[CIA] Read CIA_ICR")
 		if cia.TIMER_A_IRQ_TRIGGERED || cia.TIMER_B_IRQ_TRIGGERED {
 			result |= (1 << 7) // IRQ occured
 			if cia.TIMER_A_IRQ_TRIGGERED {
@@ -149,27 +159,35 @@ func (cia *CIA) Read(address uint16) byte {
 
 func (cia *CIA) Write(address uint16, data byte) {
 
+	log.Printf("[CIA] Read called with memory address %x with data %x", address, data)
+
 	switch address {
 	case CIA_PORT_A:
-		cia.PORT_A = data
+		log.Printf("[CIA] Write data %x to CIA_PORT_A", data)
+		cia.WriteRegister(data)
 		break
 	case CIA_TA_LO:
+		log.Printf("[CIA] Write data %x to CIA_TA_LO", data)
 		cia.TIMER_A_LATCH &= 0xff00
 		cia.TIMER_A_LATCH |= uint16(data)
 		break
 	case CIA_TA_HI:
+		log.Printf("[CIA] Write data %x to CIA_TA_HI", data)
 		cia.TIMER_A_LATCH &= 0x00ff
 		cia.TIMER_A_LATCH |= uint16(data << 8)
 		break
 	case CIA_TB_LO:
+		log.Printf("[CIA] Write data %x to CIA_TB_LO", data)
 		cia.TIMER_B_LATCH &= 0xff00
 		cia.TIMER_B_LATCH |= uint16(data)
 		break
 	case CIA_TB_HI:
+		log.Printf("[CIA] Write data %x to CIA_TB_HI", data)
 		cia.TIMER_B_LATCH &= 0x00ff
 		cia.TIMER_B_LATCH |= uint16(data << 8)
 		break
 	case CIA_ICR:
+		log.Printf("[CIA] Write data %x to CIA_ICR", data)
 		if n.GetBit(data, 0) {
 			cia.TIMER_A_IRQ = n.GetBit(data, 7)
 		}
@@ -179,6 +197,7 @@ func (cia *CIA) Write(address uint16, data byte) {
 		}
 		break
 	case CIA_CRA:
+		log.Printf("[CIA] Write data %x to CIA_CRA", data)
 		cia.TIMER_A_ENABLED = ((data & (1 << 0)) != 0)
 		cia.TIMER_A_INPUT = (data & (1 << 5)) >> 5
 		if (data & (1 << 4)) != 0 {
@@ -186,6 +205,7 @@ func (cia *CIA) Write(address uint16, data byte) {
 		}
 		break
 	case CIA_CRB:
+		log.Printf("[CIA] Write data %x to CIA_CRB", data)
 		cia.TIMER_B_ENABLED = ((data & 0x1) != 0)
 		cia.TIMER_B_INPUT = (data & (1 << 5)) | (data&(1<<6))>>5
 		if (data & (1 << 4)) != 0 {

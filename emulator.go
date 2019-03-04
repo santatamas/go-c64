@@ -35,6 +35,8 @@ func NewEmulator(testMode bool) Emulator {
 
 	cia := CIA.NewCIA(irqChannel)
 	memory := RAM.NewMemory(testMode, &cia)
+	cia = CIA.NewCIA(irqChannel)
+	memory.Cia = &cia
 	cpu := MOS6510.NewCPU(&memory)
 	keyboard := CIA.NewKeyboard(&cia)
 	display := VIC2.NewMemoryDisplay(&memory, keyPressChannel)
