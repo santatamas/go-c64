@@ -57,9 +57,6 @@ const ROM_TEST_ADDR = 0x400
 const IRQ_VECTOR_ADDR_LO = 0xFFFE
 const IRQ_VECTOR_ADDR_HI = 0xFFFF
 
-const CIA_ADDR_RANGE_LO = 0xDC00
-const CIA_ADDR_RANGE_HI = 0xDC0F
-
 func NewMemory(testMode bool, cia *CIA.CIA) Memory {
 	mem := Memory{make([]byte, MemSize),
 		make([]byte, MemSize),
@@ -84,6 +81,8 @@ func NewMemory(testMode bool, cia *CIA.CIA) Memory {
 		mem.LoadROM("./_resources/roms/kernal.901227-03.bin", ROM_KERNAL_ADDR)
 	}
 
+	mem.SetupBanks(LORAM | HIRAM | CHAREN)
+
 	return mem
 }
 
@@ -92,64 +91,60 @@ func (m *Memory) ReadAll() []byte {
 }
 
 func (m *Memory) ReadZeroPage(zeroPageAddress byte) byte {
-	return m.memory_ram[zeroPageAddress]
+	return m.ReadAbsolute(uint16(zeroPageAddress)) //m.memory_ram[zeroPageAddress]
 }
 
 func (m *Memory) ReadAbsolute(absoluteAddress uint16) byte {
 
-	/*
-	   // VIC-II DMA or Character ROM
-	   if (page >= kAddrVicFirstPage && page <= kAddrVicLastPage)
-	   {
-	     if(banks_[kBankCharen] == kIO)
-	       retval = vic_->read_register(addr&0x7f);
-	     else if(banks_[kBankCharen] == kROM)
-	       retval = mem_rom_[addr];
-	     else
-	       retval = mem_ram_[addr];
-	   }
-	   // CIA1
-	   else if (page == kAddrCIA1Page)
-	   {
-	     if(banks_[kBankCharen] == kIO)
-	       retval = cia1_->read_register(addr&0x0f);
-	     else
-	       retval = mem_ram_[addr];
-	   }
-	   // CIA2
-	   else if (page == kAddrCIA2Page)
-	   {
-	     if(banks_[kBankCharen] == kIO)
-	       retval = cia2_->read_register(addr&0x0f);
-	     else
-	       retval = mem_ram_[addr];
-	   }
-	   // BASIC or RAM
-	   else if (page >= kAddrBasicFirstPage && page <= kAddrBasicLastPage)
-	   {
-	     if (banks_[kBankBasic] == kROM)
-	       retval = mem_rom_[addr];
-	     else
-	       retval = mem_ram_[addr];
-	   }
-	   // KERNAL
-	   else if (page >= kAddrKernalFirstPage && page <= kAddrKernalLastPage)
-	   {
-	     if (banks_[kBankKernal] == kROM)
-	       retval = mem_rom_[addr];
-	     else
-	       retval = mem_ram_[addr];
-	   }
-	   else
-	   {
-	     retval = mem_ram_[addr];
-	   }
-	*/
+	retval := byte(0x0)
+	page := absoluteAddress & 0xff00
 
-	if absoluteAddress >= CIA_ADDR_RANGE_LO && absoluteAddress <= CIA_ADDR_RANGE_HI {
-		return m.Cia.Read(absoluteAddress)
+	// VIC2
+	if page >= AddrVicFirstPage && page <= AddrVicLastPage {
+		if m.banks[CHARENG] == IO {
+			//retval = vic_->read_register(addr&0x7f);
+			retval = m.memory_ram[absoluteAddress]
+		} else if m.banks[CHARENG] == ROM {
+			retval = m.memory_rom[absoluteAddress]
+		} else {
+			retval = m.memory_ram[absoluteAddress]
+		}
+		// CIA 1
+	} else if page == AddrCIA1Page {
+		if m.banks[CHARENG] == IO {
+			retval = m.Cia.Read(absoluteAddress)
+		} else {
+			retval = m.memory_ram[absoluteAddress]
+		}
+		// CIA 2
+	} else if page == AddrCIA2Page {
+		if m.banks[CHARENG] == IO {
+			// TODO: implement CIA2
+			//retval = m.Cia.Read(absoluteAddress)
+			retval = m.memory_ram[absoluteAddress]
+		} else {
+			retval = m.memory_ram[absoluteAddress]
+		}
+		// BASIC
+	} else if page >= AddrBasicFirstPage && page <= AddrBasicLastPage {
+		if m.banks[BASIC] == ROM {
+			retval = m.memory_rom[absoluteAddress]
+		} else {
+			retval = m.memory_ram[absoluteAddress]
+		}
+		// KERNAL
+	} else if page >= AddrKernalFirstPage && page <= AddrKernalLastPage {
+		if m.banks[KERNAL] == ROM {
+			retval = m.memory_rom[absoluteAddress]
+		} else {
+			retval = m.memory_ram[absoluteAddress]
+		}
+		// ELSE return ram content
+	} else {
+		retval = m.memory_ram[absoluteAddress]
 	}
-	return m.memory_ram[absoluteAddress]
+
+	return retval
 }
 
 func (m *Memory) SetupBanks(value byte) {
@@ -169,15 +164,14 @@ func (m *Memory) SetupBanks(value byte) {
 	}
 	/* charen */
 	if charen && (loram || hiram) {
-		m.banks[CHAREN] = IO
+		m.banks[CHARENG] = IO
 	} else if charen && !loram && !hiram {
-		m.banks[CHAREN] = RAM
+		m.banks[CHARENG] = RAM
 	} else {
-		m.banks[CHAREN] = ROM
+		m.banks[CHARENG] = ROM
 	}
 
-	/* write the config to the zero page */
-	m.WriteZeroPage(AddrMemoryLayout, value)
+	m.memory_ram[AddrMemoryLayout] = value
 }
 
 func (m *Memory) WriteZeroPage(zeroPageAddress byte, value byte) {
@@ -192,41 +186,36 @@ func (m *Memory) WriteZeroPage(zeroPageAddress byte, value byte) {
 
 func (m *Memory) WriteAbsolute(absoluteAddress uint16, value byte) {
 
-	/*
-		// VIC-II DMA or Character ROM
-		else if (page >= kAddrVicFirstPage && page <= kAddrVicLastPage)
-		{
-		if(banks_[kBankCharen] == kIO)
-			vic_->write_register(addr&0x7f,v);
-		else
-			mem_ram_[addr] = v;
-		}
-		// CIA1
-		else if (page == kAddrCIA1Page)
-		{
-		if(banks_[kBankCharen] == kIO)
-			cia1_->write_register(addr&0x0f,v);
-		else
-			mem_ram_[addr] = v;
-		}
-		else if (page == kAddrCIA2Page)
-		{
-		if(banks_[kBankCharen] == kIO)
-			cia2_->write_register(addr&0x0f,v);
-		else
-			mem_ram_[addr] = v;
-		}
-		else
-		{
-		mem_ram_[addr] = v;
-		}
-	*/
+	page := absoluteAddress & 0xff00
 
-	if absoluteAddress >= CIA_ADDR_RANGE_LO && absoluteAddress <= CIA_ADDR_RANGE_HI {
-		m.Cia.Write(absoluteAddress, value)
+	// VIC2
+	if page >= AddrVicFirstPage && page <= AddrVicLastPage {
+		if m.banks[CHARENG] == IO {
+			//retval = vic_->read_register(addr&0x7f);
+			m.memory_ram[absoluteAddress] = value
+		} else {
+			m.memory_ram[absoluteAddress] = value
+		}
+		// CIA 1
+	} else if page == AddrCIA1Page {
+		if m.banks[CHARENG] == IO {
+			m.Cia.Write(absoluteAddress, value)
+		} else {
+			m.memory_ram[absoluteAddress] = value
+		}
+		// CIA 2
+	} else if page == AddrCIA2Page {
+		if m.banks[CHARENG] == IO {
+			// TODO: implement CIA2
+			//retval = m.Cia.Read(absoluteAddress)
+			m.memory_ram[absoluteAddress] = value
+		} else {
+			m.memory_ram[absoluteAddress] = value
+		}
+		// BASIC
+	} else {
+		m.memory_ram[absoluteAddress] = value
 	}
-
-	m.memory_ram[absoluteAddress] = value
 }
 
 func (m *Memory) LoadROM(path string, address uint16) {
