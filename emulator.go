@@ -35,8 +35,8 @@ func NewEmulator(testMode bool) Emulator {
 
 	cia := CIA.NewCIA(irqChannel)
 	memory := RAM.NewMemory(testMode, &cia)
-	cia = CIA.NewCIA(irqChannel)
-	memory.Cia = &cia
+	//cia = CIA.NewCIA(irqChannel)
+	//memory.Cia = &cia
 	cpu := MOS6510.NewCPU(&memory)
 	keyboard := CIA.NewKeyboard(&cia)
 	display := VIC2.NewMemoryDisplay(&memory, keyPressChannel)
@@ -83,7 +83,11 @@ func (emu *Emulator) Start() {
 			}
 
 			if !emu.pauseFlag {
-				emu.CIA.ExecuteCycle(emu.cycleCount * 2)
+				emu.CIA.ExecuteCycle(emu.CPU.CycleCount)
+				if emu.CIA.Interrupt {
+					emu.CIA.Interrupt = false
+					emu.CPU.InterruptFlag = true
+				}
 				result := emu.CPU.ExecuteCycle()
 				if !result {
 					break

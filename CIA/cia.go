@@ -70,7 +70,8 @@ func (cia *CIA) ExecuteCycle(currentCpuCycleCount uint64) {
 				log.Printf("[CIA] Timer A - Triggering IRQ")
 				cia.TIMER_A_IRQ_TRIGGERED = true
 				//timer_a_irq_triggered_ = true;
-				cia.IrqChannel <- true
+				//cia.IrqChannel <- true
+				cia.Interrupt = true
 			}
 			cia.TIMER_A = cia.TIMER_A_LATCH
 			//reset_timer_a();
@@ -84,7 +85,8 @@ func (cia *CIA) ExecuteCycle(currentCpuCycleCount uint64) {
 				log.Printf("[CIA] Timer B - Triggering IRQ")
 				cia.TIMER_B_IRQ_TRIGGERED = true
 				//timer_B_irq_triggered_ = true;
-				cia.IrqChannel <- true
+				//cia.IrqChannel <- true
+				cia.Interrupt = true
 			}
 			cia.TIMER_B = cia.TIMER_B_LATCH
 			//reset_timer_B();
@@ -200,6 +202,7 @@ func (cia *CIA) Write(address uint16, data byte) {
 		log.Printf("[CIA] Write data %x to CIA_CRA", data)
 		cia.TIMER_A_ENABLED = ((data & (1 << 0)) != 0)
 		cia.TIMER_A_INPUT = (data & (1 << 5)) >> 5
+		log.Printf("[CIA] TIMER A input mode: %b", cia.TIMER_A_INPUT)
 		if (data & (1 << 4)) != 0 {
 			cia.TIMER_A = cia.TIMER_A_LATCH
 		}
@@ -208,6 +211,7 @@ func (cia *CIA) Write(address uint16, data byte) {
 		log.Printf("[CIA] Write data %x to CIA_CRB", data)
 		cia.TIMER_B_ENABLED = ((data & 0x1) != 0)
 		cia.TIMER_B_INPUT = (data & (1 << 5)) | (data&(1<<6))>>5
+		log.Printf("[CIA] TIMER B input mode: %b", cia.TIMER_A_INPUT)
 		if (data & (1 << 4)) != 0 {
 			cia.TIMER_B = cia.TIMER_B_LATCH
 		}

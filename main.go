@@ -19,9 +19,6 @@ func main() {
 	disableLogsPtr := flag.Bool("no-logs", false, "Disable logging. All log output is discarded.")
 	flag.Parse()
 
-	emulator := NewEmulator(*testModePtr)
-	emulator.Delay = time.Duration(*delayPtr)
-
 	// set normal file logging
 	if !*disableLogsPtr {
 		file, _ := os.OpenFile("log.txt", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
@@ -31,6 +28,9 @@ func main() {
 		log.Println("[DEBUG] Logging is disabled.")
 		log.SetOutput(ioutil.Discard)
 	}
+
+	emulator := NewEmulator(*testModePtr)
+	emulator.Delay = time.Duration(*delayPtr)
 
 	if *debugPtr {
 		log.Println("[DEBUG] Starting debug server...")

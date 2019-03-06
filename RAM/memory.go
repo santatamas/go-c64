@@ -102,18 +102,23 @@ func (m *Memory) ReadAbsolute(absoluteAddress uint16) byte {
 	// VIC2
 	if page >= AddrVicFirstPage && page <= AddrVicLastPage {
 		if m.banks[CHARENG] == IO {
+			log.Println("[MEM] Reading VIC2 IO")
 			//retval = vic_->read_register(addr&0x7f);
 			retval = m.memory_ram[absoluteAddress]
 		} else if m.banks[CHARENG] == ROM {
+			log.Println("[MEM] Reading VIC2 ROM")
 			retval = m.memory_rom[absoluteAddress]
 		} else {
+			log.Println("[MEM] Reading VIC2 RAM")
 			retval = m.memory_ram[absoluteAddress]
 		}
 		// CIA 1
 	} else if page == AddrCIA1Page {
 		if m.banks[CHARENG] == IO {
+			log.Println("[MEM] Reading CIA1 IO")
 			retval = m.Cia.Read(absoluteAddress)
 		} else {
+			log.Println("[MEM] Reading CIA1 RAM")
 			retval = m.memory_ram[absoluteAddress]
 		}
 		// CIA 2
@@ -121,26 +126,33 @@ func (m *Memory) ReadAbsolute(absoluteAddress uint16) byte {
 		if m.banks[CHARENG] == IO {
 			// TODO: implement CIA2
 			//retval = m.Cia.Read(absoluteAddress)
+			log.Println("[MEM] Reading CIA2 IO")
 			retval = m.memory_ram[absoluteAddress]
 		} else {
+			log.Println("[MEM] Reading CIA1 RAM")
 			retval = m.memory_ram[absoluteAddress]
 		}
 		// BASIC
 	} else if page >= AddrBasicFirstPage && page <= AddrBasicLastPage {
 		if m.banks[BASIC] == ROM {
+			log.Println("[MEM] Reading BASIC ROM")
 			retval = m.memory_rom[absoluteAddress]
 		} else {
+			log.Println("[MEM] Reading BASIC RAM")
 			retval = m.memory_ram[absoluteAddress]
 		}
 		// KERNAL
 	} else if page >= AddrKernalFirstPage && page <= AddrKernalLastPage {
 		if m.banks[KERNAL] == ROM {
+			log.Println("[MEM] Reading KERNAL ROM")
 			retval = m.memory_rom[absoluteAddress]
 		} else {
+			log.Println("[MEM] Reading KERNAL RAM")
 			retval = m.memory_ram[absoluteAddress]
 		}
 		// ELSE return ram content
 	} else {
+		log.Println("[MEM] Reading RAM")
 		retval = m.memory_ram[absoluteAddress]
 	}
 
@@ -149,6 +161,8 @@ func (m *Memory) ReadAbsolute(absoluteAddress uint16) byte {
 
 func (m *Memory) SetupBanks(value byte) {
 
+	log.Printf("[MEM] Setting bank configuration to %b", value)
+
 	// Get latch bites for 3 banks only
 	hiram := ((value & HIRAM) != 0)
 	loram := ((value & LORAM) != 0)
@@ -156,18 +170,23 @@ func (m *Memory) SetupBanks(value byte) {
 
 	/* kernal */
 	if hiram {
+		log.Println("[MEM] setting KERNAL bank to ROM")
 		m.banks[KERNAL] = ROM
 	}
 	/* basic */
 	if loram && hiram {
+		log.Println("[MEM] setting BASIC bank to ROM")
 		m.banks[BASIC] = ROM
 	}
 	/* charen */
 	if charen && (loram || hiram) {
+		log.Println("[MEM] setting CHARENG bank to IO")
 		m.banks[CHARENG] = IO
 	} else if charen && !loram && !hiram {
+		log.Println("[MEM] setting CHARENG bank to RAM")
 		m.banks[CHARENG] = RAM
 	} else {
+		log.Println("[MEM] setting CHARENG bank to ROM")
 		m.banks[CHARENG] = ROM
 	}
 

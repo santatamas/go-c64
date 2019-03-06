@@ -20,6 +20,7 @@ type CPU struct {
 	SP_HIGH       uint16
 	instrTypes    func(byte) AssemblyInstruction
 	InterruptFlag bool
+	CycleCount    uint64
 }
 
 func NewCPU(mem *RAM.Memory) CPU {
@@ -31,6 +32,7 @@ func NewCPU(mem *RAM.Memory) CPU {
 		SP:         0xFF,
 		S:          0x30,
 		instrTypes: assemblyInstructions(),
+		CycleCount: 0x6,
 	}
 }
 
@@ -74,7 +76,8 @@ func (cpu *CPU) ExecuteCycle() bool {
 	instruction := cpu.instrTypes(instrCode)
 
 	cpu.callMethod(instruction)
-	return true //instruction.Type != BRK
+	cpu.CycleCount += uint64(instruction.Cycles)
+	return true
 }
 
 // slow
