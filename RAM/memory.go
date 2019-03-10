@@ -57,6 +57,9 @@ const ROM_TEST_ADDR = 0x400
 const IRQ_VECTOR_ADDR_LO = 0xFFFE
 const IRQ_VECTOR_ADDR_HI = 0xFFFF
 
+const CIA_PORT_A = 0xDC00
+const CIA_PORT_B = 0xDC01
+
 func NewMemory(testMode bool, cia *CIA.CIA) Memory {
 	mem := Memory{make([]byte, MemSize),
 		make([]byte, MemSize),
@@ -102,23 +105,24 @@ func (m *Memory) ReadAbsolute(absoluteAddress uint16) byte {
 	// VIC2
 	if page >= AddrVicFirstPage && page <= AddrVicLastPage {
 		if m.banks[CHARENG] == IO {
-			log.Println("[MEM] Reading VIC2 IO")
+			//log.Println("[MEM] Reading VIC2 IO")
 			//retval = vic_->read_register(addr&0x7f);
 			retval = m.memory_ram[absoluteAddress]
 		} else if m.banks[CHARENG] == ROM {
-			log.Println("[MEM] Reading VIC2 ROM")
+			//log.Println("[MEM] Reading VIC2 ROM")
 			retval = m.memory_rom[absoluteAddress]
 		} else {
-			log.Println("[MEM] Reading VIC2 RAM")
+			//log.Println("[MEM] Reading VIC2 RAM")
 			retval = m.memory_ram[absoluteAddress]
 		}
 		// CIA 1
 	} else if page == AddrCIA1Page {
-		if m.banks[CHARENG] == IO {
-			log.Println("[MEM] Reading CIA1 IO")
+
+		if m.banks[CHARENG] == IO && absoluteAddress == CIA_PORT_B {
+			//log.Println("[MEM] Reading CIA1 IO")
 			retval = m.Cia.Read(absoluteAddress)
 		} else {
-			log.Println("[MEM] Reading CIA1 RAM")
+			//log.Println("[MEM] Reading CIA1 RAM")
 			retval = m.memory_ram[absoluteAddress]
 		}
 		// CIA 2
@@ -126,33 +130,33 @@ func (m *Memory) ReadAbsolute(absoluteAddress uint16) byte {
 		if m.banks[CHARENG] == IO {
 			// TODO: implement CIA2
 			//retval = m.Cia.Read(absoluteAddress)
-			log.Println("[MEM] Reading CIA2 IO")
+			//log.Println("[MEM] Reading CIA2 IO")
 			retval = m.memory_ram[absoluteAddress]
 		} else {
-			log.Println("[MEM] Reading CIA1 RAM")
+			//log.Println("[MEM] Reading CIA1 RAM")
 			retval = m.memory_ram[absoluteAddress]
 		}
 		// BASIC
 	} else if page >= AddrBasicFirstPage && page <= AddrBasicLastPage {
 		if m.banks[BASIC] == ROM {
-			log.Println("[MEM] Reading BASIC ROM")
+			//log.Println("[MEM] Reading BASIC ROM")
 			retval = m.memory_rom[absoluteAddress]
 		} else {
-			log.Println("[MEM] Reading BASIC RAM")
+			//log.Println("[MEM] Reading BASIC RAM")
 			retval = m.memory_ram[absoluteAddress]
 		}
 		// KERNAL
 	} else if page >= AddrKernalFirstPage && page <= AddrKernalLastPage {
 		if m.banks[KERNAL] == ROM {
-			log.Println("[MEM] Reading KERNAL ROM")
+			//log.Println("[MEM] Reading KERNAL ROM")
 			retval = m.memory_rom[absoluteAddress]
 		} else {
-			log.Println("[MEM] Reading KERNAL RAM")
+			//log.Println("[MEM] Reading KERNAL RAM")
 			retval = m.memory_ram[absoluteAddress]
 		}
 		// ELSE return ram content
 	} else {
-		log.Println("[MEM] Reading RAM")
+		//log.Println("[MEM] Reading RAM")
 		retval = m.memory_ram[absoluteAddress]
 	}
 
@@ -217,7 +221,7 @@ func (m *Memory) WriteAbsolute(absoluteAddress uint16, value byte) {
 		}
 		// CIA 1
 	} else if page == AddrCIA1Page {
-		if m.banks[CHARENG] == IO {
+		if m.banks[CHARENG] == IO && absoluteAddress == CIA_PORT_A {
 			m.Cia.Write(absoluteAddress, value)
 		} else {
 			m.memory_ram[absoluteAddress] = value

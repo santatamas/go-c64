@@ -103,7 +103,7 @@ func (display *MemoryDisplay) Start() {
 			switch ev := ev.(type) {
 			case *tcell.EventKey:
 				switch ev.Key() {
-				case tcell.KeyEscape, tcell.KeyEnter:
+				case tcell.KeyEscape:
 					close(quit)
 					return
 				case tcell.KeyCtrlL:
