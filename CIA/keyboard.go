@@ -4,6 +4,7 @@ import (
 	"github.com/gdamore/tcell"
 	"log"
 	"strconv"
+	//"time"
 )
 
 type Pair struct {
@@ -90,6 +91,9 @@ func (keyboard *Keyboard) PressKey(key *tcell.EventKey) {
 		keyboard.Cia.UnsetKey(keyboard.previousRow[i], keyboard.previousCol[i])
 	}
 
+	//keyboard.Cia.SendInterrupt()
+
+	//time.Sleep(100)
 	if key.Key() == tcell.KeyEnter {
 		keyboard.Cia.SetKey(0, 1, true)
 
@@ -116,6 +120,7 @@ func (keyboard *Keyboard) PressKey(key *tcell.EventKey) {
 		keyboard.previousRow[0] = keyMask.row
 		keyboard.previousCol[0] = keyMask.col
 	}
+
 }
 
 func NewKeyboard(cia *CIA) Keyboard {

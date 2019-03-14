@@ -66,6 +66,10 @@ func (cia *CIA) ExecuteCycle(currentCpuCycleCount uint64) {
 	cia.Previous_cpu_cycles = currentCpuCycleCount
 }
 
+func (cia *CIA) SendInterrupt() {
+	cia.Interrupt = true
+}
+
 func (cia *CIA) SetKey(row byte, col byte, interrupt bool) {
 	log.Printf("[CIA] Setkey called")
 	cia.Keyboard_matrix[row] |= (1 << col)
