@@ -90,7 +90,7 @@ func NewMemory(testMode bool, cia *CIA.CIA) Memory {
 }
 
 func (m *Memory) ReadAll() []byte {
-	return m.memory_ram
+	return m.memory_rom
 }
 
 func (m *Memory) ReadZeroPage(zeroPageAddress byte) byte {
