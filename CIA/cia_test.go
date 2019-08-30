@@ -6,10 +6,10 @@ import (
 
 func TestCIA_SetKey_SetsMatrixProperly_SingleKey(t *testing.T) {
 	// Arrange
-	cia := NewCIA()
+	cia := NewCIA(nil)
 
 	// Act
-	cia.SetKey(1, 2)
+	cia.SetKey(1, 2, false)
 
 	// Assert
 	rowValue := cia.Keyboard_matrix[1]
@@ -22,11 +22,11 @@ func TestCIA_SetKey_SetsMatrixProperly_SingleKey(t *testing.T) {
 
 func TestCIA_SetKey_SetsMatrixProperly_MultipleKeys(t *testing.T) {
 	// Arrange
-	cia := NewCIA()
+	cia := NewCIA(nil)
 
 	// Act
-	cia.SetKey(1, 2)
-	cia.SetKey(1, 5)
+	cia.SetKey(1, 2, false)
+	cia.SetKey(1, 5, false)
 
 	// Assert
 	rowValue := cia.Keyboard_matrix[1]
@@ -39,10 +39,10 @@ func TestCIA_SetKey_SetsMatrixProperly_MultipleKeys(t *testing.T) {
 
 func TestCIA_ReadRegister_ReturnsCorrectValue_SingleKey(t *testing.T) {
 	// Arrange
-	cia := NewCIA()
+	cia := NewCIA(nil)
 
 	// Act
-	cia.SetKey(1, 2)
+	cia.SetKey(1, 2, false)
 	cia.WriteRegister(253) // 1111 1101 - read 2nd row values
 
 	// Assert
@@ -56,10 +56,10 @@ func TestCIA_ReadRegister_ReturnsCorrectValue_SingleKey(t *testing.T) {
 
 func TestCIA_ReadRegister_ReturnsZeroValue_SingleKey(t *testing.T) {
 	// Arrange
-	cia := NewCIA()
+	cia := NewCIA(nil)
 
 	// Act
-	cia.SetKey(1, 2)
+	cia.SetKey(1, 2, false)
 	cia.WriteRegister(0xFF) // 1111 1111 - ignore all row values
 
 	// Assert
@@ -73,11 +73,11 @@ func TestCIA_ReadRegister_ReturnsZeroValue_SingleKey(t *testing.T) {
 
 func TestCIA_ReadRegister_ReturnsCorrectValue_MultipleKey(t *testing.T) {
 	// Arrange
-	cia := NewCIA()
+	cia := NewCIA(nil)
 
 	// Act
-	cia.SetKey(1, 2)
-	cia.SetKey(1, 4)
+	cia.SetKey(1, 2, false)
+	cia.SetKey(1, 4, false)
 	cia.WriteRegister(253) // 1111 1001 - read 2nd row values
 
 	// Assert

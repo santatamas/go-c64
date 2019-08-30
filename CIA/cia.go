@@ -1,9 +1,10 @@
 package CIA
 
 import (
-	n "github.com/santatamas/go-c64/numeric"
 	"log"
 	"strconv"
+
+	n "github.com/santatamas/go-c64/numeric"
 )
 
 const CIA_PORT_A = 0xDC00    // data port A (write register)
@@ -74,6 +75,7 @@ func (cia *CIA) SetKey(row byte, col byte, interrupt bool) {
 	log.Printf("[CIA] Setkey called")
 	cia.Keyboard_matrix[row] |= (1 << col)
 
+	// HACK - this interrupt setting should not happen here
 	cia.Interrupt = interrupt
 
 	log.Printf("[CIA] SetKey called with row " + strconv.Itoa(int(row)) + " and col " + strconv.Itoa(int(col)))
