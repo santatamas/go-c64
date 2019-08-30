@@ -3,11 +3,14 @@ package main
 import (
 	//"bufio"
 	"flag"
-	"github.com/santatamas/go-c64/internals"
 	"io/ioutil"
 	"log"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"time"
+
+	"github.com/santatamas/go-c64/internals"
 )
 
 func main() {
@@ -19,8 +22,8 @@ func main() {
 	disableLogsPtr := flag.Bool("no-logs", false, "Disable logging. All log output is discarded.")
 	flag.Parse()
 
-	// set normal file logging
 	if !*disableLogsPtr {
+		// set normal file logging
 		file, _ := os.OpenFile("log.txt", os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0666)
 		log.SetOutput(file)
 		log.Println("[DEBUG] Logging to file: log.txt")
@@ -33,14 +36,9 @@ func main() {
 	emulator.Delay = time.Duration(*delayPtr)
 
 	if *debugPtr {
+		// Start custom debug server (using a Websocket connection to send telemetry)
 		log.Println("[DEBUG] Starting debug server...")
 		hub := internals.StartDebugServer()
-
-		// Uncomment to forward logs to websocket
-		// [WARNING] - It's prone to buffer overflow in the socket reader/writer
-		//debugServerLogger := internals.DebugLog{Hub: hub}
-		//log.SetOutput(debugServerLogger)
-
 		emulator.Debug = *debugPtr
 		emulator.hub = hub
 	}
@@ -54,11 +52,16 @@ func main() {
 		// set program counter to hard reset address
 		emulator.CPU.PC = 0xfce2
 	} else {
-		log.Println("[DEBUG] Loading PRG...")
+		log.Println("[DEBUG] Loading PRG, setting PC to custom address")
 		emulator.loadFile(*programPathPtr)
 	}
 
-	emulator.Start()
+	// Starting up the PPROF debug server
+	s := &http.Server{
+		Addr: ":8888",
+	}
+	go s.ListenAndServe()
 
-	//bufio.NewReader(os.Stdin).ReadBytes('\n')
+	// Starting emulation and display/keyboard input listeners
+	emulator.Start()
 }
