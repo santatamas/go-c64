@@ -8,7 +8,7 @@ import (
 
 func TestCPU_stackPush_happypath(t *testing.T) {
 	// Arrange
-	memory := RAM.NewMemory()
+	memory := RAM.NewMemory(nil)
 	cpu := NewCPU(&memory)
 
 	// Act
@@ -22,7 +22,7 @@ func TestCPU_stackPush_happypath(t *testing.T) {
 
 func TestCPU_stackPush_overflow(t *testing.T) {
 	// Arrange
-	memory := RAM.NewMemory()
+	memory := RAM.NewMemory(nil)
 	cpu := NewCPU(&memory)
 
 	// Act
@@ -40,7 +40,7 @@ func TestCPU_stackPush_overflow(t *testing.T) {
 
 func TestCPU_stackPop_underflow(t *testing.T) {
 	// Arrange
-	memory := RAM.NewMemory()
+	memory := RAM.NewMemory(nil)
 	cpu := NewCPU(&memory)
 	cpu.stackPush(100)
 
@@ -56,7 +56,7 @@ func TestCPU_stackPop_underflow(t *testing.T) {
 
 func TestCPU_stackPop_happypath(t *testing.T) {
 	// Arrange
-	memory := RAM.NewMemory()
+	memory := RAM.NewMemory(nil)
 	cpu := NewCPU(&memory)
 	cpu.stackPush(100)
 

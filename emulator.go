@@ -2,6 +2,11 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
+	"os"
+	"time"
+
 	"github.com/gdamore/tcell"
 	"github.com/santatamas/go-c64/CIA"
 	"github.com/santatamas/go-c64/MOS6510"
@@ -9,10 +14,6 @@ import (
 	"github.com/santatamas/go-c64/VIC2"
 	"github.com/santatamas/go-c64/internals"
 	n "github.com/santatamas/go-c64/numeric"
-	"io/ioutil"
-	"log"
-	"os"
-	"time"
 )
 
 type Emulator struct {
@@ -28,15 +29,33 @@ type Emulator struct {
 	hub        *internals.Hub
 }
 
+const ROM_CHAR_ADDR = 0xD000
+const ROM_KERNAL_ADDR = 0xE000
+const ROM_BASIC_ADDR = 0xA000
+const ROM_TEST_ADDR = 0x400
+
 func NewEmulator(testMode bool) Emulator {
 
 	keyPressChannel := make(chan *tcell.EventKey)
 	irqChannel := make(chan bool)
 
 	cia := CIA.NewCIA(irqChannel)
-	memory := RAM.NewMemory(testMode, &cia)
-	//cia = CIA.NewCIA(irqChannel)
-	//memory.Cia = &cia
+	memory := RAM.NewMemory(&cia)
+
+	if testMode {
+		log.Println("[MEM] Loading TEST ROM...")
+		memory.LoadROM("./_resources/tests/6502_functional_test.bin", ROM_TEST_ADDR)
+	} else {
+		log.Println("[MEM] Loading BASIC ROM...")
+		memory.LoadROM("./_resources/roms/basic.901226-01.bin", ROM_BASIC_ADDR)
+
+		log.Println("[MEM] Loading CHAR ROM...")
+		memory.LoadROM("./_resources/roms/characters.901225-01.bin", ROM_CHAR_ADDR)
+
+		log.Println("[MEM] Loading KERNAL ROM...")
+		memory.LoadROM("./_resources/roms/kernal.901227-03.bin", ROM_KERNAL_ADDR)
+	}
+
 	cpu := MOS6510.NewCPU(&memory)
 	keyboard := CIA.NewKeyboard(&cia)
 	display := VIC2.NewMemoryDisplay(&memory, keyPressChannel)

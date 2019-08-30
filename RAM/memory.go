@@ -2,10 +2,11 @@ package RAM
 
 import (
 	"fmt"
-	"github.com/santatamas/go-c64/CIA"
 	"io/ioutil"
 	"log"
 	"os"
+
+	"github.com/santatamas/go-c64/CIA"
 )
 
 type Memory struct {
@@ -60,7 +61,7 @@ const IRQ_VECTOR_ADDR_HI = 0xFFFF
 const CIA_PORT_A = 0xDC00
 const CIA_PORT_B = 0xDC01
 
-func NewMemory(testMode bool, cia *CIA.CIA) Memory {
+func NewMemory(cia *CIA.CIA) Memory {
 	mem := Memory{make([]byte, MemSize),
 		make([]byte, MemSize),
 		make([]BankConfiguration, 7),
@@ -68,20 +69,6 @@ func NewMemory(testMode bool, cia *CIA.CIA) Memory {
 
 	for i := 0; i < 6; i++ {
 		mem.banks[i] = RAM
-	}
-
-	if testMode {
-		log.Println("[MEM] Loading TEST ROM...")
-		mem.LoadROM("./_resources/tests/6502_functional_test.bin", ROM_TEST_ADDR)
-	} else {
-		log.Println("[MEM] Loading BASIC ROM...")
-		mem.LoadROM("./_resources/roms/basic.901226-01.bin", ROM_BASIC_ADDR)
-
-		log.Println("[MEM] Loading CHAR ROM...")
-		mem.LoadROM("./_resources/roms/characters.901225-01.bin", ROM_CHAR_ADDR)
-
-		log.Println("[MEM] Loading KERNAL ROM...")
-		mem.LoadROM("./_resources/roms/kernal.901227-03.bin", ROM_KERNAL_ADDR)
 	}
 
 	mem.SetupBanks(LORAM | HIRAM | CHAREN)

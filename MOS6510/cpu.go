@@ -1,10 +1,11 @@
 package MOS6510
 
 import (
-	"github.com/santatamas/go-c64/RAM"
-	n "github.com/santatamas/go-c64/numeric"
 	"log"
 	"reflect"
+
+	"github.com/santatamas/go-c64/RAM"
+	n "github.com/santatamas/go-c64/numeric"
 )
 
 type CPU struct {
@@ -37,7 +38,7 @@ func NewCPU(mem *RAM.Memory) CPU {
 }
 
 func getTestCPU() (result CPU) {
-	memory := RAM.NewMemory(false, nil)
+	memory := RAM.NewMemory(nil)
 	return NewCPU(&memory)
 }
 
