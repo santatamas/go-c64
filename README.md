@@ -9,11 +9,19 @@ To run the debug client, you'll have to install [Angular6+](https://angular.io),
 ### How to build the emulator
 Run `make build` in the root directory.
 
+### How to run the emulator
+Run `make run` to fire up the emulator with the official C64 BASIC rom, with logs disabled.
+
 ### Loading & running binaries
 By default, the emulator will load the official C64 BASIC ROM. If you'd like to specify a custom binary, you can use the `--prg-path` flag (see makefile for examples).
 
 ### Running unit tests
 Run `make test` in the root directory
+
+### Running built-in profiler
+The emulator is running the built-it go profiler by default.
+* You can access it by opening a browser and navigating to `http://<hostname>:8888/debug/pprof`.
+* It's also possible to generate a flame diagram with the hotspots by running `docker run uber/go-torch -u http://<host_ip>:8888/debug/pprof -p -t=30 > torch.svg`
 
 ### Using the internal debug server
 1. Start the emulator with the `-debug=true` flag, or run `make debug`
