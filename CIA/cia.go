@@ -71,12 +71,9 @@ func (cia *CIA) SendInterrupt() {
 	cia.Interrupt = true
 }
 
-func (cia *CIA) SetKey(row byte, col byte, interrupt bool) {
+func (cia *CIA) SetKey(row byte, col byte) {
 	log.Printf("[CIA] Setkey called")
 	cia.Keyboard_matrix[row] |= (1 << col)
-
-	// HACK - this interrupt setting should not happen here
-	cia.Interrupt = interrupt
 
 	log.Printf("[CIA] SetKey called with row " + strconv.Itoa(int(row)) + " and col " + strconv.Itoa(int(col)))
 	log.Println("[CIA] Keyboard matrix current row:" + strconv.FormatInt(int64(cia.Keyboard_matrix[row]), 2))
@@ -88,6 +85,10 @@ func (cia *CIA) UnsetKey(row byte, col byte) {
 
 	log.Printf("[CIA] UnsetKey called with row " + strconv.Itoa(int(row)) + " and col " + strconv.Itoa(int(col)))
 	log.Println("[CIA] Keyboard matrix current row:" + strconv.FormatInt(int64(cia.Keyboard_matrix[row]), 2))
+}
+
+func (cia *CIA) ResetKeyboardMatrix() {
+	cia.Keyboard_matrix = make([]byte, 8)
 }
 
 func (cia *CIA) Read(address uint16) byte {

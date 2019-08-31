@@ -1,10 +1,10 @@
 package CIA
 
 import (
-	"github.com/gdamore/tcell"
 	"log"
 	"strconv"
-	//"time"
+
+	"github.com/gdamore/tcell"
 )
 
 type Pair struct {
@@ -80,34 +80,19 @@ func keymap() func(rune) Pair {
 }
 
 type Keyboard struct {
-	Cia         *CIA
-	previousRow []byte
-	previousCol []byte
+	Cia *CIA
 }
 
 func (keyboard *Keyboard) PressKey(key *tcell.EventKey) {
 
-	for i := 0; i < 2; i++ {
-		keyboard.Cia.UnsetKey(keyboard.previousRow[i], keyboard.previousCol[i])
-	}
+	keyboard.Cia.ResetKeyboardMatrix()
 
-	//keyboard.Cia.SendInterrupt()
-
-	//time.Sleep(100)
 	if key.Key() == tcell.KeyEnter {
-		keyboard.Cia.SetKey(0, 1, true)
+		keyboard.Cia.SetKey(0, 1)
 
-		keyboard.previousRow[0] = 0
-		keyboard.previousCol[0] = 1
 	} else if key.Rune() == '"' {
-		keyboard.Cia.SetKey(1, 7, false)
-		keyboard.Cia.SetKey(7, 3, true)
-
-		keyboard.previousRow[0] = 1
-		keyboard.previousCol[0] = 7
-
-		keyboard.previousRow[1] = 7
-		keyboard.previousCol[1] = 3
+		keyboard.Cia.SetKey(1, 7)
+		keyboard.Cia.SetKey(7, 3)
 
 	} else {
 		r := key.Rune()
@@ -115,14 +100,13 @@ func (keyboard *Keyboard) PressKey(key *tcell.EventKey) {
 		log.Println("[Keyboard] PressKey called with rune:" + string(r))
 		keyMask := keymap()(r)
 
-		keyboard.Cia.SetKey(keyMask.row, keyMask.col, true)
-
-		keyboard.previousRow[0] = keyMask.row
-		keyboard.previousCol[0] = keyMask.col
+		keyboard.Cia.SetKey(keyMask.row, keyMask.col)
 	}
+
+	keyboard.Cia.SendInterrupt()
 
 }
 
 func NewKeyboard(cia *CIA) Keyboard {
-	return Keyboard{cia, make([]byte, 2), make([]byte, 2)}
+	return Keyboard{cia}
 }

@@ -59,13 +59,8 @@ func (cpu *CPU) Interrupt() {
 	cpu.setStatusBRK(true)
 }
 
-func (cpu *CPU) ExecuteCycle() bool {
+func (cpu *CPU) ExecuteCycle() {
 	log.Printf("Current PC address: %x \n", cpu.PC)
-
-	if cpu.InterruptFlag {
-		cpu.Interrupt()
-		cpu.InterruptFlag = false
-	}
 
 	// Fetch first executable instruction code from memory
 	instrCode := cpu.Memory.ReadAbsolute(cpu.PC)
@@ -78,7 +73,6 @@ func (cpu *CPU) ExecuteCycle() bool {
 
 	cpu.callMethod(instruction)
 	cpu.CycleCount += uint64(instruction.Cycles)
-	return true
 }
 
 // slow

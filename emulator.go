@@ -105,13 +105,9 @@ func (emu *Emulator) Start() {
 				emu.CIA.ExecuteCycle(emu.CPU.CycleCount)
 				if emu.CIA.Interrupt {
 					emu.CIA.Interrupt = false
-					emu.CPU.InterruptFlag = true
+					emu.CPU.Interrupt()
 				}
-				result := emu.CPU.ExecuteCycle()
-				if !result {
-					break
-				}
-
+				emu.CPU.ExecuteCycle()
 				emu.cycleCount++
 			}
 
