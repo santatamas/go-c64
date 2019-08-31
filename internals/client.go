@@ -6,10 +6,11 @@ package internals
 
 import (
 	"bytes"
-	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
 const (
@@ -99,18 +100,7 @@ func (c *Client) writePump() {
 				return
 			}
 
-			//decodedMessage := string(message)
-			//decodedMessage = string(len(decod edMessage))
-
-			//stringBytes := byte[] (len(message))
 			w.Write([]byte(message))
-
-			// Add queued chat messages to the current websocket message.
-			/*n := len(c.send)
-			for i := 0; i < n; i++ {
-				w.Write(newline)
-				w.Write(<-c.send)
-			}*/
 
 			if err := w.Close(); err != nil {
 				return

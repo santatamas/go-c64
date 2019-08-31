@@ -4,8 +4,6 @@ import (
 	"github.com/gdamore/tcell"
 )
 
-//TODO use github.com/fatih/color
-
 func getColor(value byte) (st tcell.Color) {
 	value = value & 15
 	switch value {

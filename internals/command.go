@@ -2,8 +2,6 @@ package internals
 
 import (
 	"bytes"
-	//"encoding/json"
-	//"log"
 )
 
 // Command represents a debugger command sent from the WebUI

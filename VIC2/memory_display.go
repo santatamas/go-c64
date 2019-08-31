@@ -2,10 +2,11 @@ package VIC2
 
 import (
 	"fmt"
-	"github.com/gdamore/tcell"
-	"github.com/santatamas/go-c64/RAM"
 	"os"
 	"time"
+
+	"github.com/gdamore/tcell"
+	"github.com/santatamas/go-c64/RAM"
 )
 
 type MemoryDisplay struct {
@@ -127,11 +128,8 @@ loop:
 		}
 
 		display.DrawState(s)
-		//rasterReg := display.memory.ReadAbsolute(RASTER_REGISTER_ADDR)
-		//rasterReg++
 		display.memory.WriteAbsolute(RASTER_REGISTER_ADDR, 0)
 		time.Sleep(100 * time.Millisecond)
-		//log.Println("screen refresh")
 	}
 
 	s.Fini()
