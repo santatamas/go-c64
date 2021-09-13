@@ -36,10 +36,11 @@ run-bin:
 	./dist/main -prg-path=_resources/rom/64c.251913-01.bin
 
 debug-client:
-	cd internals/WebUI; ng serve --open
+	cd internals/WebUI/dist/WebUI;http-server . -p 4200
+#cd internals/WebUI; ng serve --open
 
 debug:
-	go build -o ./dist/main
+#go build -o ./dist/main
 	./dist/main -debug=true
 
 debug-test-suite:
