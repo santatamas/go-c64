@@ -1,5 +1,5 @@
-export class Telemetry {
-    Command: string;
-    Parameter: string;
-    Payload: any;
+export interface Telemetry {
+  Command: string;
+  Parameter?: string;
+  Payload?: any;
 }

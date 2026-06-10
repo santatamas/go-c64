@@ -1,31 +1,26 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 import { WebsocketService } from './websocket.service';
-import { Observable, Subscriber, observable, Subject } from 'rxjs';
-import { map, filter, scan } from 'rxjs/operators';
 import { Telemetry } from '../models/telemetry.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class TelemetryService {
-
-  observableSocket: Subject<any>;
+  private telemetry$: Subject<string>;
 
   constructor(private webSocket: WebsocketService) {
-    const openSubscriber = Subscriber.create(() => console.log('connection opened'));
-    this.observableSocket = this.webSocket.createObservableSocket('ws://localhost:8080/ws', openSubscriber);
-  }
-  getTelemetry(): Subject<any> {
-    return this.observableSocket;
+    this.telemetry$ = this.webSocket.connect('ws://localhost:8080/ws');
   }
 
-  sendStringCommand(command: string) {
-    const telemetryRequest = new Telemetry();
-    telemetryRequest.Command = command;
-    this.sendCommand(telemetryRequest);
+  getTelemetry(): Subject<string> {
+    return this.telemetry$;
   }
 
-  sendCommand(request: Telemetry) {
+  sendStringCommand(command: string): void {
+    const request: Telemetry = { Command: command };
+    this.sendCommand(request);
+  }
+
+  sendCommand(request: Telemetry): void {
     this.webSocket.send(JSON.stringify(request));
   }
 }

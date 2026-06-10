@@ -1,4 +1,4 @@
-export class TableRow {
-    Name: string;
-    Value: string;
+export interface TableRow {
+  Name: string;
+  Value: string;
 }
