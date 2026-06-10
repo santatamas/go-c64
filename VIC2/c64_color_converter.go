@@ -1,7 +1,7 @@
 package VIC2
 
 import (
-	"github.com/gdamore/tcell"
+	"github.com/gdamore/tcell/v2"
 )
 
 func getColor(value byte) (st tcell.Color) {

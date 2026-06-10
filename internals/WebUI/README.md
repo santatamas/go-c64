@@ -1,27 +1,46 @@
-# WebUI
+# C64 Emulator Debug UI
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 7.0.6.
+An Angular 19 web application for debugging the go-c64 emulator in real-time via WebSocket.
 
-## Development server
+## Features
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+- Real-time CPU register inspection
+- CIA chip state monitoring
+- Emulator state tracking
+- Memory hex viewer with PC highlighting
+- Execution control (start/stop/step)
+- Breakpoint support
 
-## Code scaffolding
+## Quick Start
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+```bash
+# Install dependencies
+npm install
 
-## Build
+# Start development server
+npm start
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
+# Production build
+npm run build
+```
 
-## Running unit tests
+## Requirements
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+- Node.js 18+
+- npm 9+
+- The go-c64 emulator running with `-debug=true` flag
 
-## Running end-to-end tests
+## Technology Stack
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+- Angular 19.2
+- Angular Material 19.2
+- RxJS 7.8
+- TypeScript 5.5
 
-## Further help
+## Usage
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+1. Start the emulator: `../../dist/main -debug=true`
+2. Start the dev server: `npm start`
+3. Open http://localhost:4200
+
+See [docs/DEBUG_UI.md](../../docs/DEBUG_UI.md) for detailed documentation.

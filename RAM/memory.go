@@ -2,7 +2,7 @@ package RAM
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 
@@ -234,7 +234,7 @@ func (m *Memory) LoadROM(path string, address uint16) {
 		fmt.Printf("Error! Can't open file %s", path)
 	}
 
-	byteContent, err := ioutil.ReadAll(file)
+	byteContent, err := io.ReadAll(file)
 	if err != nil {
 		log.Fatal(err)
 	}

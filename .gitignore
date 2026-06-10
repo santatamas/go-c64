@@ -12,4 +12,6 @@
 *.out
 
 log.txt
-debug
+debuginternals/WebUI/.angular/
+internals/WebUI/node_modules/
+internals/WebUI/dist/

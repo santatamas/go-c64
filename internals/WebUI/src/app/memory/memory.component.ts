@@ -1,28 +1,25 @@
-import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
+import { MatCardModule } from '@angular/material/card';
 import { TelemetryService } from '../services/telemetry.service';
 import { Telemetry } from '../models/telemetry.model';
 import { CPUState } from '../models/cpustate.model';
 
 @Component({
   selector: 'app-memory',
-  templateUrl: './memory.component.html',
-  styleUrls: ['./memory.component.scss']
+  standalone: true,
+  imports: [MatCardModule],
+  template: `
+    <mat-card>
+      <mat-card-header><mat-card-title>Memory</mat-card-title><mat-card-subtitle>Program counter window</mat-card-subtitle></mat-card-header>
+      <mat-card-content #dataContainer class="monospace" style="font-size:12px;overflow-x:auto;white-space:nowrap;"></mat-card-content>
+    </mat-card>
+  `
 })
-export class MemoryComponent implements OnInit {
-
-  public memoryContent = 'blank';
-  public cpuState: CPUState;
-
-  @ViewChild('dataContainer') dataContainer: ElementRef;
-
-  loadData(data) {
-      this.dataContainer.nativeElement.innerHTML = data;
-  }
+export class MemoryComponent {
+  @ViewChild('dataContainer') dataContainer!: ElementRef;
+  private cpuState: CPUState = { A: 0, Y: 0, X: 0, S: 0, P: 0, PC: 0, SP: 0, SP_LOW: 0, SP_HIGH: 0, InstructionType: 0, InstructionName: '' };
 
   constructor(private telemetryService: TelemetryService) {
-
-    this.cpuState = new CPUState();
-
     telemetryService.getTelemetry().subscribe((t: string) => {
       const telemetry: Telemetry = JSON.parse(t);
 
@@ -31,58 +28,30 @@ export class MemoryComponent implements OnInit {
       }
 
       if (telemetry.Command === 'GetMemoryContent') {
-
-        let byteCharacters = atob(telemetry.Payload);
-        let byteNumbers = new Array(byteCharacters.length);
-
+        const byteCharacters = atob(telemetry.Payload);
+        const byteNumbers = new Array(byteCharacters.length);
         for (let i = 0; i < byteCharacters.length; i++) {
           byteNumbers[i] = byteCharacters.charCodeAt(i);
         }
-
-        let byteArray = new Uint8Array(byteNumbers);
-
-        //console.log(byteArray);
+        const byteArray = new Uint8Array(byteNumbers);
         let hexResult = '';
-        let cnt = 0;
-        let windowSize = 100;
-        let windowStart = 0;
-        let windowEnd = 0;
+        const windowSize = 100;
+        let windowStart = this.cpuState.PC - windowSize;
+        while (windowStart % 16 !== 0) windowStart--;
+        let windowEnd = this.cpuState.PC + windowSize;
+        while (windowEnd % 16 !== 15) windowEnd++;
 
-        windowStart = this.cpuState.PC - windowSize;
-        while (windowStart % 16 !== 0) {
-          windowStart = windowStart - 1;
-        }
-        windowEnd = this.cpuState.PC + windowSize;
-        while (windowEnd % 16 !== 15) {
-          windowEnd = windowEnd + 1;
-        }
-
-        for (let byte of byteNumbers) {
-
-          // only print the window
+        for (let cnt = 0; cnt < byteNumbers.length; cnt++) {
           if (cnt >= windowStart && cnt <= windowEnd) {
-
-            // highlight the current PC instruction
-            if (cnt === this.cpuState.PC) {
-              hexResult += '<span style="background-color: yellow;color: red;" class="current-pc-highlight">';
-            }
-
-            // tslint:disable-next-line:max-line-length
-            hexResult += (cnt % 16 ? ' ' : '<br/>' + (1e7 + (cnt).toString(16)).slice(-8) + ' | ') + (1e7 + byteArray[cnt].toString(16)).slice(-2);
-
-            if (cnt === this.cpuState.PC) {
-              hexResult += '</span>';
-            }
+            if (cnt === this.cpuState.PC) hexResult += '<span class="current-pc-highlight">';
+            hexResult += (cnt % 16 ? ' ' : '<br/>' + ('0000000' + cnt.toString(16)).slice(-8) + ' | ') + ('0' + byteArray[cnt].toString(16)).slice(-2);
+            if (cnt === this.cpuState.PC) hexResult += '</span>';
           }
-          cnt++;
         }
-
-        this.dataContainer.nativeElement.innerHTML = hexResult;
+        if (this.dataContainer) {
+          this.dataContainer.nativeElement.innerHTML = hexResult;
+        }
       }
     });
   }
-
-  ngOnInit() {
-  }
-
 }

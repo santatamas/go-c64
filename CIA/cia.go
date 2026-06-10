@@ -72,18 +72,18 @@ func (cia *CIA) SendInterrupt() {
 }
 
 func (cia *CIA) SetKey(row byte, col byte) {
-	log.Printf("[CIA] Setkey called")
+	log.Println("[CIA] Setkey called")
 	cia.Keyboard_matrix[row] |= (1 << col)
 
-	log.Printf("[CIA] SetKey called with row " + strconv.Itoa(int(row)) + " and col " + strconv.Itoa(int(col)))
+	log.Println("[CIA] SetKey called with row " + strconv.Itoa(int(row)) + " and col " + strconv.Itoa(int(col)))
 	log.Println("[CIA] Keyboard matrix current row:" + strconv.FormatInt(int64(cia.Keyboard_matrix[row]), 2))
 }
 
 func (cia *CIA) UnsetKey(row byte, col byte) {
-	log.Printf("Unsetkey called")
-	cia.Keyboard_matrix[row] &= (0 << col)
+	log.Println("[CIA] Unsetkey called")
+	cia.Keyboard_matrix[row] &= ^(1 << col)
 
-	log.Printf("[CIA] UnsetKey called with row " + strconv.Itoa(int(row)) + " and col " + strconv.Itoa(int(col)))
+	log.Println("[CIA] UnsetKey called with row " + strconv.Itoa(int(row)) + " and col " + strconv.Itoa(int(col)))
 	log.Println("[CIA] Keyboard matrix current row:" + strconv.FormatInt(int64(cia.Keyboard_matrix[row]), 2))
 }
 

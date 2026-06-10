@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"time"
 
-	"github.com/gdamore/tcell"
+	"github.com/gdamore/tcell/v2"
 	"github.com/santatamas/go-c64/CIA"
 	"github.com/santatamas/go-c64/MOS6510"
 	"github.com/santatamas/go-c64/RAM"
@@ -127,7 +127,7 @@ func (emu *Emulator) loadFile(path string) {
 		fmt.Println("Error! Can't open file")
 	}
 
-	byteContent, err := ioutil.ReadAll(file)
+	byteContent, err := io.ReadAll(file)
 	if err != nil {
 		log.Fatal(err)
 	}

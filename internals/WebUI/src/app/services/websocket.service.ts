@@ -1,34 +1,23 @@
 import { Injectable } from '@angular/core';
-import { Subscriber, Observable, Subject } from 'rxjs';
-import { Telemetry } from '../models/telemetry.model';
+import { Subject, Observable } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class WebsocketService {
+  private ws!: WebSocket;
+  private subject = new Subject<string>();
 
-  private ws: WebSocket;
-  private observable: Observable<any>;
-  private subject: Subject<any> = new Subject<any>();
-
-  createObservableSocket(url: string, openSubscriber: Subscriber<any>): Subject<any> {
+  connect(url: string): Subject<string> {
     this.ws = new WebSocket(url);
-    new Observable(observer => {
-      this.ws.onmessage = event => observer.next(event.data);
-      this.ws.onerror = event => observer.error(event);
-      this.ws.onclose = event => observer.complete();
-      this.ws.onopen = event => {
-        openSubscriber.next();
-        openSubscriber.complete();
-      };
-
-      return () => this.ws.close();
-    }).subscribe((data) => { this.subject.next(data); console.log(data); });
-
+    this.ws.onmessage = (event) => this.subject.next(event.data);
+    this.ws.onerror = (event) => console.error('WebSocket error', event);
+    this.ws.onclose = () => console.log('WebSocket closed');
+    this.ws.onopen = () => console.log('WebSocket connected');
     return this.subject;
   }
 
-  send(message: any) {
-    this.ws.send(message);
+  send(message: string): void {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(message);
+    }
   }
 }

@@ -3,7 +3,7 @@ package main
 import (
 	//"bufio"
 	"flag"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
@@ -29,7 +29,7 @@ func main() {
 		log.Println("[DEBUG] Logging to file: log.txt")
 	} else {
 		log.Println("[DEBUG] Logging is disabled.")
-		log.SetOutput(ioutil.Discard)
+		log.SetOutput(io.Discard)
 	}
 
 	emulator := NewEmulator(*testModePtr)
